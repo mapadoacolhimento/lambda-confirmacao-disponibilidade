@@ -1,7 +1,7 @@
 {
-  "name": "lambda-pedido-acolhimento",
+  "name": "lambda-confirmacao-disponibilidade",
   "version": "0.0.1",
-  "description": "AWS Lambda com API Gateways que fazem tudo relacionado ao processamento do pedido de acolhimento da MSR.",
+  "description": "AWS Lambda com API Gateways que fazem a confirmação de disponibilidade da Voluntária.",
   "scripts": {
     "prepare": "husky install",
     "dev": "serverless offline",
