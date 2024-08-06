@@ -1,0 +1,87 @@
+name: Tests, Static Analysis and Deploy
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  STAGE: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
+
+on:
+  pull_request:
+    branches:
+      - "**"
+
+  push:
+    branches:
+      - "main"
+
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm run test:ci
+
+  deployment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment:
+      name: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
+    needs:
+      - integration
+    if: always() && needs.integration.result == 'success'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Create env file
+        run: |
+          cat << EOF > .env
+          AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION=${{ secrets.AWS_REGION }}
+          JWT_SECRET=${{ secrets.JWT_SECRET }}
+          DATABASE_URL=${{ github.ref == 'refs/heads/main' && secrets.PROD_MAPA_DATABASE_URL || secrets.STG_MAPA_DATABASE_URL }}
+          NEW_RELIC_ACCOUNT_ID=${{ secrets.NEW_RELIC_ACCOUNT_ID }}
+          NEW_RELIC_API_KEY=${{ secrets.NEW_RELIC_API_KEY }}
+          EOF
+
+      - name: Install serverless globally
+        run: npm install serverless@3.38.0 --global
+
+      # - name: Serverless AWS authentication
+      #   run: sls config credentials --provider aws --key ${{ secrets.AWS_ACCESS_KEY_ID }} --secret ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      # - name: Deploy API
+      #   run: npm run deploy -- --stage $STAGE

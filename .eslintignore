@@ -1,0 +1,6 @@
+# Generated files
+
+package-lock.json
+node_modules
+.serverless
+.esbuild
