@@ -3,7 +3,7 @@ import type {
   Context,
   APIGatewayProxyCallback,
 } from "aws-lambda";
-import { object, number } from "yup";
+import { object, number, string } from "yup";
 
 import client from "./prismaClient";
 
@@ -13,12 +13,15 @@ import {
   notFoundErrorPayload,
   //   stringfyBigInt,
 } from "./utils";
-import { checkAvailability } from "./availabilityConfirmation/checkAvailability";
+import { MatchStage, MatchType } from "@prisma/client";
+import confirmMatch from "./matchConfirmation/confirmMatch";
 
 const bodySchema = object({
   supportRequestId: number().required(),
   msrId: number().required(),
   volunteerId: number().required(),
+  matchType: string().oneOf(Object.values(MatchType)).required(),
+  matchStage: string().oneOf(Object.values(MatchStage)).required(),
 })
   .required()
   .strict();
@@ -51,32 +54,6 @@ export default async function handler(
 
     const { supportRequestId, volunteerId, msrId } = validatedBody;
 
-    const supportRequest = await client.supportRequests.findUnique({
-      where: { supportRequestId: supportRequestId },
-    });
-
-    if (!supportRequest) {
-      const errorMessage = `support_request not found for support_request_id '${supportRequestId}'`;
-
-      return callback(
-        null,
-        notFoundErrorPayload("create-confirmation", errorMessage)
-      );
-    }
-
-    const volunteer = await client.volunteers.findUnique({
-      where: { id: volunteerId },
-    });
-
-    if (!volunteer) {
-      const errorMessage = `volunteer not found for volunteer_id '${volunteerId}'`;
-
-      return callback(
-        null,
-        notFoundErrorPayload("create-confirmation", errorMessage)
-      );
-    }
-
     const msrPII = await client.mSRPiiSec.findUnique({
       where: { msrId: msrId },
     });
@@ -90,7 +67,11 @@ export default async function handler(
       );
     }
 
-    const availabilityConfirmation = await checkAvailability(msrPII);
+    const availabilityConfirmation = await confirmMatch(
+      supportRequestId,
+      msrPII,
+      volunteerId
+    );
 
     const bodyRes = JSON.stringify({
       message: availabilityConfirmation,
