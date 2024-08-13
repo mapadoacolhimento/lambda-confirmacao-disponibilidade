@@ -11,8 +11,9 @@ import {
   getErrorMessage,
   isJsonString,
   notFoundErrorPayload,
-  stringfyBigInt,
+  //   stringfyBigInt,
 } from "./utils";
+import { checkAvailability } from "./availabilityConfirmation/checkAvailability";
 
 const bodySchema = object({
   supportRequestId: number().required(),
@@ -48,7 +49,7 @@ export default async function handler(
 
     const validatedBody = await bodySchema.validate(parsedBody);
 
-    const { supportRequestId, volunteerId } = validatedBody;
+    const { supportRequestId, volunteerId, msrId } = validatedBody;
 
     const supportRequest = await client.supportRequests.findUnique({
       where: { supportRequestId: supportRequestId },
@@ -57,7 +58,10 @@ export default async function handler(
     if (!supportRequest) {
       const errorMessage = `support_request not found for support_request_id '${supportRequestId}'`;
 
-      return callback(null, notFoundErrorPayload("create-match", errorMessage));
+      return callback(
+        null,
+        notFoundErrorPayload("create-confirmation", errorMessage)
+      );
     }
 
     const volunteer = await client.volunteers.findUnique({
@@ -67,22 +71,30 @@ export default async function handler(
     if (!volunteer) {
       const errorMessage = `volunteer not found for volunteer_id '${volunteerId}'`;
 
-      return callback(null, notFoundErrorPayload("create-match", errorMessage));
+      return callback(
+        null,
+        notFoundErrorPayload("create-confirmation", errorMessage)
+      );
     }
 
-    //   const match = await createMatch(
-    //     supportRequest,
-    //     volunteerAvailability,
-    //     matchType,
-    //     matchStage
-    //   );
+    const msrPII = await client.mSRPiiSec.findUnique({
+      where: { msrId: msrId },
+    });
 
-    //   const bodyRes = JSON.stringify({
-    //     message: stringfyBigInt(match),
-    //   });
+    if (!msrPII) {
+      const errorMessage = `MSR not found for msr_id '${msrId}'`;
+
+      return callback(
+        null,
+        notFoundErrorPayload("create-confirmation", errorMessage)
+      );
+    }
+
+    const availabilityConfirmation = await checkAvailability(msrPII);
 
     const bodyRes = JSON.stringify({
-      message: stringfyBigInt(supportRequest),
+      message: availabilityConfirmation,
+      // message: stringfyBigInt(availabilityConfirmation),
     });
 
     return callback(null, {
