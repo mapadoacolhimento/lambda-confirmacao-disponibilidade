@@ -18,7 +18,6 @@ import confirmMatch from "./matchConfirmation/confirmMatch";
 
 const bodySchema = object({
   supportRequestId: number().required(),
-  msrId: number().required(),
   volunteerId: number().required(),
   matchType: string().oneOf(Object.values(MatchType)).required(),
   matchStage: string().oneOf(Object.values(MatchStage)).required(),
@@ -52,14 +51,58 @@ export default async function handler(
 
     const validatedBody = await bodySchema.validate(parsedBody);
 
-    const { supportRequestId, volunteerId, msrId } = validatedBody;
+    const { supportRequestId, volunteerId, matchType, matchStage } =
+      validatedBody;
+    const matchInfo = { matchType, matchStage };
+
+    const supportRequest = await client.supportRequests.findUnique({
+      where: { supportRequestId: supportRequestId },
+      select: {
+        supportRequestId: true,
+        msrId: true,
+        zendeskTicketId: true,
+      },
+    });
+
+    if (!supportRequest) {
+      const errorMessage = `support_request not found for support_request_id '${supportRequestId}'`;
+
+      return callback(
+        null,
+        notFoundErrorPayload("create-confirmation", errorMessage)
+      );
+    }
 
     const msrPII = await client.mSRPiiSec.findUnique({
-      where: { msrId: msrId },
+      where: { msrId: supportRequest.msrId },
+      select: {
+        msrId: true,
+        email: true,
+        firstName: true,
+      },
     });
 
     if (!msrPII) {
-      const errorMessage = `MSR not found for msr_id '${msrId}'`;
+      const errorMessage = `MSR not found for msr_id '${supportRequest.msrId}'`;
+
+      return callback(
+        null,
+        notFoundErrorPayload("create-confirmation", errorMessage)
+      );
+    }
+
+    const volunteer = await client.volunteers.findUnique({
+      where: { id: volunteerId },
+      select: {
+        id: true,
+        firstName: true,
+        phone: true,
+        zendeskUserId: true,
+      },
+    });
+
+    if (!volunteer) {
+      const errorMessage = `Volunteer not found for volunteer_id '${volunteerId}'`;
 
       return callback(
         null,
@@ -68,10 +111,14 @@ export default async function handler(
     }
 
     const matchConfirmation = await confirmMatch(
-      supportRequestId,
+      supportRequest,
       msrPII,
-      volunteerId
+      volunteer,
+      matchInfo
     );
+
+    if (!matchConfirmation)
+      throw new Error("Couldn't create match confirmation");
 
     const bodyRes = JSON.stringify({
       message: stringfyBigInt(matchConfirmation),
