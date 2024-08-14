@@ -11,7 +11,7 @@ import {
   getErrorMessage,
   isJsonString,
   notFoundErrorPayload,
-  //   stringfyBigInt,
+  stringfyBigInt,
 } from "./utils";
 import { MatchStage, MatchType } from "@prisma/client";
 import confirmMatch from "./matchConfirmation/confirmMatch";
@@ -67,15 +67,14 @@ export default async function handler(
       );
     }
 
-    const availabilityConfirmation = await confirmMatch(
+    const matchConfirmation = await confirmMatch(
       supportRequestId,
       msrPII,
       volunteerId
     );
 
     const bodyRes = JSON.stringify({
-      message: availabilityConfirmation,
-      // message: stringfyBigInt(availabilityConfirmation),
+      message: stringfyBigInt(matchConfirmation),
     });
 
     return callback(null, {

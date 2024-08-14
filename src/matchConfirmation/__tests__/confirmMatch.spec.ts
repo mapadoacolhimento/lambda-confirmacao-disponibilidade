@@ -1,12 +1,8 @@
 import type { MatchConfirmationStatus } from "@prisma/client";
-import * as sendEmailToMsr from "../../emailClient";
-import * as sendEmail from "../../emailClient/sendEmail";
 import { prismaMock } from "../../setupTests";
 import * as confirmationLogic from "../confirmationLogic";
 import confirmMatch from "../confirmMatch";
 
-const sendEmailMock = jest.spyOn(sendEmail, "default");
-const sendEmailToMsrMock = jest.spyOn(sendEmailToMsr, "sendEmailToMsr");
 const createMatchConfimationMock = jest.spyOn(
   confirmationLogic,
   "createMatchConfirmation"
@@ -34,21 +30,7 @@ const matchConfirmation = {
   updatedAt: new Date(),
 };
 
-describe("checkAvailability", () => {
-  beforeEach(() => {
-    sendEmailMock.mockResolvedValueOnce(true);
-  });
-
-  it("should call sendEmailToMsr with correct params", async () => {
-    await confirmMatch(supportRequestId, msrPII, volunteerId);
-
-    expect(sendEmailToMsrMock).toHaveBeenNthCalledWith(
-      1,
-      "teste@msr.com",
-      "teste"
-    );
-  });
-
+describe("confirmMatch", () => {
   it("should call createMatchConfirmation with correct params", async () => {
     await confirmMatch(supportRequestId, msrPII, volunteerId);
 
