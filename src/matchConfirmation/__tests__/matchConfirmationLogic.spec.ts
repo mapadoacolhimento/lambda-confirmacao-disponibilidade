@@ -1,108 +1,61 @@
-import type {
-  MatchConfirmationStatus,
-  Matches,
-  MatchStage,
-  MatchType,
-  SupportRequestsStatus,
-  SupportType,
-} from "@prisma/client";
 import { prismaMock } from "../../setupTests";
 import {
   createMatchConfirmation,
+  makeVolunteerUnavailable,
   updateMsrZendeskTicket,
   updateSupportRequest,
 } from "../matchConfirmationLogic";
-import * as updateTicket from "../../zendeskClient/updateTicket";
-import type { ZendeskTicket } from "../../types";
-
-const supportRequest = {
-  supportRequestId: 1,
-  msrId: 12345 as unknown as bigint,
-  zendeskTicketId: 1 as unknown as bigint,
-  supportType: "psychological" as SupportType,
-  supportExpertise: "not_found",
-  priority: null,
-  hasDisability: null,
-  requiresLibras: null,
-  acceptsOnlineSupport: true,
-  city: "SAO PAULO",
-  state: "SP",
-  lat: null,
-  lng: null,
-  status: "waiting_for_confirmation" as SupportRequestsStatus,
-  createdAt: new Date(),
-  updatedAt: new Date(),
-};
-
-const msrPII = {
-  msrId: 12345 as unknown as bigint,
-  email: "teste@msr.com",
-  firstName: "teste",
-  phone: "not_found",
-  dateOfBirth: new Date(),
-  createdAt: new Date(),
-  updatedAt: new Date(),
-};
-
-const volunteer = {
-  id: 2,
-  firstName: "Voluntária",
-  zendeskUserId: 10 as unknown as bigint,
-};
-
-const matchConfirmation = {
-  matchConfirmationId: 1,
-  supportRequestId: 1,
-  msrId: 12345 as unknown as bigint,
-  volunteerId: 2,
-  status: "waiting" as MatchConfirmationStatus,
-  matchType: "daily" as MatchType,
-  matchStage: "ideal" as MatchStage,
-  matchId: null,
-  createdAt: new Date(),
-  updatedAt: new Date(),
-};
-
-const matchInfo = {
-  matchType: "daily",
-  matchStage: "ideal",
-} as Pick<Matches, "matchType" | "matchStage">;
+import {
+  matchConfirmationMock,
+  matchInfoMock,
+  msrPIIMock,
+  msrZendeskTicketMock,
+  supportRequestMock,
+  updatedUserMock,
+  updateTicketMock,
+  updateUserMock,
+  volunteerAvailabilityMock,
+  volunteerMock,
+} from "../__mocks__/utils";
 
 describe("createMatchConfirmation", () => {
   it("should create an entry in match_confirmations table and return this entry", async () => {
-    prismaMock.matchConfirmations.create.mockResolvedValue(matchConfirmation);
-
-    const res = await createMatchConfirmation(
-      supportRequest.supportRequestId,
-      msrPII.msrId,
-      volunteer.id,
-      matchInfo
+    prismaMock.matchConfirmations.create.mockResolvedValue(
+      matchConfirmationMock
     );
 
-    expect(res).toStrictEqual(matchConfirmation);
+    const res = await createMatchConfirmation(
+      supportRequestMock.supportRequestId,
+      msrPIIMock.msrId,
+      volunteerMock.id,
+      matchInfoMock
+    );
+
+    expect(res).toStrictEqual(matchConfirmationMock);
   });
 });
 
 describe("updateSupportRequest", () => {
   it("should update the support_request and return the support_request_id", async () => {
-    prismaMock.supportRequests.update.mockResolvedValue(supportRequest);
+    prismaMock.supportRequests.update.mockResolvedValue(supportRequestMock);
 
-    const res = await updateSupportRequest(supportRequest.supportRequestId);
+    const res = await updateSupportRequest(supportRequestMock.supportRequestId);
 
-    expect(res).toStrictEqual(supportRequest);
+    expect(res).toStrictEqual(supportRequestMock);
   });
 });
 
 describe("updateMsrZendeskTicket", () => {
-  const updateTicketMock = jest
-    .spyOn(updateTicket, "default")
-    .mockImplementation(() => Promise.resolve(null));
-
   it("should call updateTicket with correct params", async () => {
-    await updateMsrZendeskTicket(supportRequest.zendeskTicketId, volunteer);
+    updateTicketMock.mockResolvedValueOnce(msrZendeskTicketMock);
+
+    await updateMsrZendeskTicket(
+      supportRequestMock.zendeskTicketId,
+      volunteerMock
+    );
 
     expect(updateTicketMock).toHaveBeenNthCalledWith(1, {
-      id: supportRequest.zendeskTicketId,
+      id: supportRequestMock.zendeskTicketId,
       custom_fields: [
         {
           id: 360014379412,
@@ -110,35 +63,59 @@ describe("updateMsrZendeskTicket", () => {
         },
       ],
       comment: {
-        body: `**Encaminhamento: Aguardando Confirmação** \n\n Enviamos uma mensagem para a [Voluntária ${volunteer.firstName}](https://mapadoacolhimento.zendesk.com/agent/users/${volunteer.zendeskUserId}) e estamos aguardando a sua confirmação para realizar o encaminhamento.`,
+        body: `**Encaminhamento: Aguardando Confirmação** \n\n Enviamos uma mensagem para a [Voluntária ${volunteerMock.firstName}](https://mapadoacolhimento.zendesk.com/agent/users/${volunteerMock.zendeskUserId}) e estamos aguardando a sua confirmação para realizar o encaminhamento.`,
         public: false,
       },
     });
   });
 
-  it("should return null if the ticket wasn't updated", async () => {
+  it("should throw an error if no ticket was updated on Zendesk", async () => {
     updateTicketMock.mockResolvedValueOnce(null);
 
+    await expect(
+      updateMsrZendeskTicket(supportRequestMock.zendeskTicketId, volunteerMock)
+    ).rejects.toThrow("Couldn't update msr Zendesk ticket");
+  });
+
+  it("should return the updated ticket", async () => {
+    updateTicketMock.mockResolvedValueOnce(msrZendeskTicketMock);
+
     const res = await updateMsrZendeskTicket(
-      supportRequest.zendeskTicketId,
-      volunteer
+      supportRequestMock.zendeskTicketId,
+      volunteerMock
     );
+
+    expect(res).toStrictEqual(msrZendeskTicketMock);
+  });
+});
+
+describe("makeVolunteerUnavailable", () => {
+  it("should return null if volunteer zendeskUserId is null", async () => {
+    const res = await makeVolunteerUnavailable({
+      ...volunteerMock,
+      zendeskUserId: null,
+    });
 
     expect(res).toStrictEqual(null);
   });
 
-  it("should return the updated ticket", async () => {
-    const mockMsrZendeskTicket = {
-      id: 123412341234 as unknown as bigint,
-    } as ZendeskTicket;
+  it("should throw an error if no volunteer was updated on Zendesk", async () => {
+    updateUserMock.mockResolvedValueOnce(null);
 
-    updateTicketMock.mockResolvedValueOnce(mockMsrZendeskTicket);
+    await expect(makeVolunteerUnavailable(volunteerMock)).rejects.toThrow(
+      "Couldn't update volunteer Zendesk status"
+    );
+  });
 
-    const res = await updateMsrZendeskTicket(
-      supportRequest.zendeskTicketId,
-      volunteer
+  it("should update volunteer condition to indisponivel_aguardando_confirmacao and return this entry", async () => {
+    updateUserMock.mockResolvedValueOnce(updatedUserMock);
+    prismaMock.volunteers.update.mockResolvedValue(volunteerMock);
+    prismaMock.volunteerAvailability.update.mockResolvedValue(
+      volunteerAvailabilityMock
     );
 
-    expect(res).toStrictEqual(mockMsrZendeskTicket);
+    const res = await makeVolunteerUnavailable(volunteerMock);
+
+    expect(res).toStrictEqual(volunteerMock);
   });
 });

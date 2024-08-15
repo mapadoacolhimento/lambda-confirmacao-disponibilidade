@@ -6,6 +6,7 @@ import type {
 } from "@prisma/client";
 import {
   createMatchConfirmation,
+  makeVolunteerUnavailable,
   updateMsrZendeskTicket,
   updateSupportRequest,
 } from "./matchConfirmationLogic";
@@ -26,6 +27,10 @@ export default async function confirmMatch(
     supportRequest.supportRequestId
   );
   if (!updatedSupportRequest) return null;
+
+  const updatedVolunteer = await makeVolunteerUnavailable(volunteer);
+
+  if (!updatedVolunteer) return null;
 
   const matchConfirmation = await createMatchConfirmation(
     supportRequest.supportRequestId,

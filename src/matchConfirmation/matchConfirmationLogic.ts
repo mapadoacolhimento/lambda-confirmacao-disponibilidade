@@ -2,6 +2,8 @@ import type { Matches, Volunteers } from "@prisma/client";
 import { ZENDESK_CUSTOM_FIELDS_DICIO } from "../constants";
 import client from "../prismaClient";
 import updateTicket from "../zendeskClient/updateTicket";
+import type { ZendeskUser } from "../types";
+import updateUser from "../zendeskClient/updateUser";
 
 export async function createMatchConfirmation(
   supportRequestId: number,
@@ -67,5 +69,51 @@ export async function updateMsrZendeskTicket(
 
   const zendeskTicket = await updateTicket(ticket);
 
+  if (!zendeskTicket) throw new Error("Couldn't update msr Zendesk ticket");
+
   return zendeskTicket;
+}
+
+export async function makeVolunteerUnavailable(
+  volunteer: Pick<Volunteers, "id" | "zendeskUserId">
+) {
+  if (!volunteer.zendeskUserId) return null;
+
+  const volunteerZendeskUser: Pick<ZendeskUser, "id" | "user_fields"> = {
+    id: volunteer.zendeskUserId,
+    user_fields: { condition: "indisponivel_aguardando_confirmacao" },
+  };
+  const updatedZendeskUser = await updateUser(volunteerZendeskUser);
+
+  if (!updatedZendeskUser)
+    throw new Error("Couldn't update volunteer Zendesk status");
+
+  const updatedVolunteer = await client.volunteers.update({
+    where: {
+      id: volunteer.id,
+    },
+    data: {
+      condition: "indisponivel_aguardando_confirmacao",
+      updated_at: new Date().toISOString(),
+    },
+  });
+
+  await client.volunteerStatusHistory.create({
+    data: {
+      volunteer_id: volunteer.id,
+      status: "indisponivel_aguardando_confirmacao",
+      created_at: new Date().toISOString(),
+    },
+  });
+
+  await client.volunteerAvailability.update({
+    where: {
+      volunteer_id: volunteer.id,
+    },
+    data: {
+      is_available: false,
+      updated_at: new Date().toISOString(),
+    },
+  });
+  return updatedVolunteer;
 }
