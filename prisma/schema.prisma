@@ -167,7 +167,7 @@ model Volunteers {
   id                         Int                        @id(map: "volunteers_volunteer_pkey") @default(autoincrement())
   created_at                 DateTime                   @db.Timestamptz(6)
   updated_at                 DateTime                   @db.Timestamptz(6)
-  condition                  String                     @db.VarChar(30)
+  condition                  String                     @db.VarChar(60)
   firstName                  String                     @map("first_name") @db.VarChar(200)
   lastName                   String                     @map("last_name") @db.VarChar(200)
   email                      String                     @unique @db.VarChar(254)
@@ -264,8 +264,8 @@ model MSRStatusHistory {
   msrId              BigInt    @map("msr_id")
   status             MSRStatus
   createdAt          DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
-  
-  MSRs               MSRs      @relation(fields: [msrId], references: [msrId])
+
+  MSRs MSRs @relation(fields: [msrId], references: [msrId])
 
   @@map("msr_status_history")
   @@schema("msr")
@@ -335,6 +335,8 @@ model MatchConfirmations {
   msrId               BigInt                  @map("msr_id")
   volunteerId         Int                     @map("volunteer_id")
   status              MatchConfirmationStatus
+  matchType           MatchType               @map("match_type")
+  matchStage          MatchStage              @map("match_stage")
   matchId             Int?                    @map("match_id")
   createdAt           DateTime                @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt           DateTime                @updatedAt @map("updated_at") @db.Timestamp(6)
@@ -420,7 +422,7 @@ model VolunteerStatusHistory {
   id           BigInt     @id @default(autoincrement())
   created_at   DateTime   @default(now()) @db.Timestamptz(6)
   volunteer_id Int
-  status       String     @db.VarChar(30)
+  status       String     @db.VarChar(60)
   volunteers   Volunteers @relation(fields: [volunteer_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "volunteer_status_history_volunteer_id_d1e0ea8c_fk_volunteers_id")
 
   @@index([volunteer_id], map: "volunteer_status_history_volunteer_id_d1e0ea8c")
@@ -615,6 +617,7 @@ enum SupportRequestsStatus {
   public_service_with_social_worker
   waiting_for_match
   waiting_for_match_with_priority
+  waiting_for_confirmation
   duplicated
   closed
   special_case
