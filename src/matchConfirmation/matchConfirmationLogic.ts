@@ -28,6 +28,25 @@ export async function createMatchConfirmation(
   return matchConfirmation;
 }
 
+export async function updateSupportRequest(supportRequestId: number) {
+  const supportRequest = await client.supportRequests.update({
+    where: {
+      supportRequestId: supportRequestId,
+    },
+    data: {
+      status: "waiting_for_confirmation",
+      updatedAt: new Date().toISOString(),
+      SupportRequestStatusHistory: {
+        create: {
+          status: "waiting_for_confirmation",
+        },
+      },
+    },
+  });
+
+  return supportRequest;
+}
+
 export async function updateMsrZendeskTicket(
   zendeskTicketId: bigint,
   volunteer: Pick<Volunteers, "firstName" | "zendeskUserId">

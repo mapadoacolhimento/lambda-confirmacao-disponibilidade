@@ -7,12 +7,19 @@ import type {
   MatchType,
   MatchConfirmationStatus,
   Matches,
+  SupportType,
+  SupportRequestsStatus,
 } from "@prisma/client";
 import type { ZendeskTicket } from "../../types";
 
 const createMatchConfimationMock = jest.spyOn(
   confirmationLogic,
   "createMatchConfirmation"
+);
+
+const updateSupportRequestMock = jest.spyOn(
+  confirmationLogic,
+  "updateSupportRequest"
 );
 
 const updateMsrZendeskTicketMock = jest
@@ -25,7 +32,21 @@ const updateTicketMock = jest
 
 const supportRequest = {
   supportRequestId: 1,
-  zendeskTicketId: 1000 as unknown as bigint,
+  msrId: 12345 as unknown as bigint,
+  zendeskTicketId: 1 as unknown as bigint,
+  supportType: "psychological" as SupportType,
+  supportExpertise: "not_found",
+  priority: null,
+  hasDisability: null,
+  requiresLibras: null,
+  acceptsOnlineSupport: true,
+  city: "SAO PAULO",
+  state: "SP",
+  lat: null,
+  lng: null,
+  status: "waiting_for_confirmation" as SupportRequestsStatus,
+  createdAt: new Date(),
+  updatedAt: new Date(),
 };
 
 const msrPII = {
@@ -94,9 +115,22 @@ describe("confirmMatch", () => {
       );
     });
 
+    it("should call updateSupportRequest with correct params", async () => {
+      updateTicketMock.mockResolvedValueOnce(updatedTicket);
+      updateMsrZendeskTicketMock.mockResolvedValueOnce(updatedTicket);
+
+      await confirmMatch(supportRequest, msrPII, volunteer, matchInfo);
+
+      expect(updateSupportRequestMock).toHaveBeenNthCalledWith(
+        1,
+        supportRequest.supportRequestId
+      );
+    });
+
     it("should call createMatchConfirmation with correct params", async () => {
       updateTicketMock.mockResolvedValueOnce(updatedTicket);
       updateMsrZendeskTicketMock.mockResolvedValueOnce(updatedTicket);
+      prismaMock.supportRequests.update.mockResolvedValue(supportRequest);
 
       await confirmMatch(supportRequest, msrPII, volunteer, matchInfo);
 
@@ -114,6 +148,7 @@ describe("confirmMatch", () => {
       updateMsrZendeskTicketMock.mockResolvedValueOnce(updatedTicket);
 
       prismaMock.matchConfirmations.create.mockResolvedValue(matchConfirmation);
+      prismaMock.supportRequests.update.mockResolvedValue(supportRequest);
 
       const res = await confirmMatch(
         supportRequest,

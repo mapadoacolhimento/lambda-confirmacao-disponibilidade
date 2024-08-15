@@ -3,18 +3,35 @@ import type {
   Matches,
   MatchStage,
   MatchType,
+  SupportRequestsStatus,
+  SupportType,
 } from "@prisma/client";
 import { prismaMock } from "../../setupTests";
 import {
   createMatchConfirmation,
   updateMsrZendeskTicket,
+  updateSupportRequest,
 } from "../matchConfirmationLogic";
 import * as updateTicket from "../../zendeskClient/updateTicket";
 import type { ZendeskTicket } from "../../types";
 
 const supportRequest = {
   supportRequestId: 1,
+  msrId: 12345 as unknown as bigint,
   zendeskTicketId: 1 as unknown as bigint,
+  supportType: "psychological" as SupportType,
+  supportExpertise: "not_found",
+  priority: null,
+  hasDisability: null,
+  requiresLibras: null,
+  acceptsOnlineSupport: true,
+  city: "SAO PAULO",
+  state: "SP",
+  lat: null,
+  lng: null,
+  status: "waiting_for_confirmation" as SupportRequestsStatus,
+  createdAt: new Date(),
+  updatedAt: new Date(),
 };
 
 const msrPII = {
@@ -63,6 +80,16 @@ describe("createMatchConfirmation", () => {
     );
 
     expect(res).toStrictEqual(matchConfirmation);
+  });
+});
+
+describe("updateSupportRequest", () => {
+  it("should update the support_request and return the support_request_id", async () => {
+    prismaMock.supportRequests.update.mockResolvedValue(supportRequest);
+
+    const res = await updateSupportRequest(supportRequest.supportRequestId);
+
+    expect(res).toStrictEqual(supportRequest);
   });
 });
 

@@ -7,6 +7,7 @@ import type {
 import {
   createMatchConfirmation,
   updateMsrZendeskTicket,
+  updateSupportRequest,
 } from "./matchConfirmationLogic";
 
 export default async function confirmMatch(
@@ -19,8 +20,12 @@ export default async function confirmMatch(
     supportRequest.zendeskTicketId,
     volunteer
   );
-
   if (!updatedTicket) return null;
+
+  const updatedSupportRequest = await updateSupportRequest(
+    supportRequest.supportRequestId
+  );
+  if (!updatedSupportRequest) return null;
 
   const matchConfirmation = await createMatchConfirmation(
     supportRequest.supportRequestId,
