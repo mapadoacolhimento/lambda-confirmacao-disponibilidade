@@ -4,7 +4,7 @@ import {
   WHATSAPP_SENDER_ID,
 } from "../constants";
 import type { TwilioMessage } from "../types/Twilio";
-import twilio = require("twilio");
+import twilio from "twilio";
 
 const twilioClient = twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
 
