@@ -7,16 +7,23 @@ import type {
 import {
   createMatchConfirmation,
   makeVolunteerUnavailable,
+  sendWhatsAppMessage,
   updateMsrZendeskTicket,
   updateSupportRequest,
 } from "./matchConfirmationLogic";
 
 export default async function confirmMatch(
-  supportRequest: Pick<SupportRequests, "supportRequestId" | "zendeskTicketId">,
+  supportRequest: Pick<
+    SupportRequests,
+    "supportRequestId" | "zendeskTicketId" | "city" | "state"
+  >,
   msrPII: Pick<MSRPiiSec, "msrId">,
-  volunteer: Pick<Volunteers, "id" | "firstName" | "zendeskUserId">,
+  volunteer: Pick<Volunteers, "id" | "firstName" | "zendeskUserId" | "phone">,
   matchInfo: Pick<Matches, "matchType" | "matchStage">
 ) {
+  const whatsappMessage = await sendWhatsAppMessage(volunteer, supportRequest);
+  if (!whatsappMessage) return null;
+
   const updatedTicket = await updateMsrZendeskTicket(
     supportRequest.zendeskTicketId,
     volunteer

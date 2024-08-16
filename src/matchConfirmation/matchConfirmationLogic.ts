@@ -1,9 +1,14 @@
-import type { Matches, Volunteers } from "@prisma/client";
-import { ZENDESK_CUSTOM_FIELDS_DICIO } from "../constants";
+import type { Matches, SupportRequests, Volunteers } from "@prisma/client";
+import {
+  WHATSAPP_TEMPLATE_WITH_CITY_ID,
+  WHATSAPP_TEMPLATE_WITHOUT_CITY_ID,
+  ZENDESK_CUSTOM_FIELDS_DICIO,
+} from "../constants";
 import client from "../prismaClient";
 import updateTicket from "../zendeskClient/updateTicket";
 import type { ZendeskUser } from "../types";
 import updateUser from "../zendeskClient/updateUser";
+import createMessage from "../twilioClient/createMessage";
 
 export async function createMatchConfirmation(
   supportRequestId: number,
@@ -116,4 +121,76 @@ export async function makeVolunteerUnavailable(
     },
   });
   return updatedVolunteer;
+}
+
+export async function sendWhatsAppMessage(
+  volunteer: Pick<Volunteers, "firstName" | "phone">,
+  supportRequest: Pick<SupportRequests, "city" | "state">
+) {
+  const msrHasCity =
+    !!supportRequest.city &&
+    supportRequest.city != "not_found" &&
+    !!supportRequest.state &&
+    supportRequest.state != "not_found";
+
+  if (!msrHasCity) {
+    const contentVariables = {
+      1: volunteer.firstName,
+    };
+
+    const message = await createMessage(
+      WHATSAPP_TEMPLATE_WITHOUT_CITY_ID,
+      volunteer.phone,
+      contentVariables
+    );
+
+    if (!message || message.status != "accepted")
+      throw new Error("Couldn't send message to volunteer");
+
+    return message;
+  }
+
+  const city = await client.cities.findFirst({
+    where: {
+      city_value: supportRequest.city as string,
+      state: supportRequest.state as string,
+    },
+    select: {
+      city_label: true,
+    },
+  });
+
+  const cityPrettyName =
+    initCap(city?.city_label || (supportRequest.city as string)) +
+    " (" +
+    supportRequest.state +
+    ")";
+
+  const contentVariables = {
+    1: volunteer.firstName,
+    2: cityPrettyName,
+  };
+
+  const message = await createMessage(
+    WHATSAPP_TEMPLATE_WITH_CITY_ID,
+    volunteer.phone,
+    contentVariables
+  );
+
+  if (!message || message.status != "accepted")
+    throw new Error("Couldn't send message to volunteer");
+
+  return message;
+}
+
+function initCap(cityName: string) {
+  const words = cityName.split(" ");
+
+  const cityNameInitCap = words
+    .map((word: string) => {
+      return word[0]?.toUpperCase() + word.substring(1).toLowerCase();
+    })
+    .join(" ");
+
+  return cityNameInitCap;
 }

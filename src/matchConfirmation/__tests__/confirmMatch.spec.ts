@@ -2,10 +2,12 @@ import * as confirmationLogic from "../matchConfirmationLogic";
 import confirmMatch from "../confirmMatch";
 import { prismaMock } from "../../setupTests";
 import {
+  createMessageMock,
   matchConfirmationMock,
   matchInfoMock,
   msrPIIMock,
   msrZendeskTicketMock,
+  sentMessageMock,
   supportRequestMock,
   updatedUserMock,
   updateTicketMock,
@@ -32,9 +34,31 @@ const updateMsrZendeskTicketMock = jest
   .spyOn(confirmationLogic, "updateMsrZendeskTicket")
   .mockImplementation(() => Promise.resolve(msrZendeskTicketMock));
 
+const sendWhatsAppMessageMock = jest.spyOn(
+  confirmationLogic,
+  "sendWhatsAppMessage"
+);
+
 describe("confirmMatch", () => {
   describe("successful res", () => {
+    it("should call sendWhatsAppMessage with correct params", async () => {
+      createMessageMock.mockResolvedValueOnce(sentMessageMock);
+      await confirmMatch(
+        supportRequestMock,
+        msrPIIMock,
+        volunteerMock,
+        matchInfoMock
+      );
+
+      expect(sendWhatsAppMessageMock).toHaveBeenNthCalledWith(
+        1,
+        volunteerMock,
+        supportRequestMock
+      );
+    });
+
     it("should call updateMsrZendeskTicketMock with correct params", async () => {
+      createMessageMock.mockResolvedValueOnce(sentMessageMock);
       await confirmMatch(
         supportRequestMock,
         msrPIIMock,
@@ -50,6 +74,7 @@ describe("confirmMatch", () => {
     });
 
     it("should call updateSupportRequest with correct params", async () => {
+      createMessageMock.mockResolvedValueOnce(sentMessageMock);
       updateTicketMock.mockResolvedValueOnce(msrZendeskTicketMock);
 
       await confirmMatch(
@@ -66,6 +91,7 @@ describe("confirmMatch", () => {
     });
 
     it("should call makeVolunteerUnavailable with correct params", async () => {
+      createMessageMock.mockResolvedValueOnce(sentMessageMock);
       updateTicketMock.mockResolvedValueOnce(msrZendeskTicketMock);
       prismaMock.supportRequests.update.mockResolvedValue(supportRequestMock);
       updateUserMock.mockResolvedValueOnce(updatedUserMock);
@@ -84,6 +110,7 @@ describe("confirmMatch", () => {
     });
 
     it("should call createMatchConfirmation with correct params", async () => {
+      createMessageMock.mockResolvedValueOnce(sentMessageMock);
       updateTicketMock.mockResolvedValueOnce(msrZendeskTicketMock);
       prismaMock.supportRequests.update.mockResolvedValue(supportRequestMock);
       updateUserMock.mockResolvedValueOnce(updatedUserMock);
@@ -106,6 +133,7 @@ describe("confirmMatch", () => {
     });
 
     it("should return the match_confirmation", async () => {
+      createMessageMock.mockResolvedValueOnce(sentMessageMock);
       updateTicketMock.mockResolvedValueOnce(msrZendeskTicketMock);
       prismaMock.matchConfirmations.create.mockResolvedValue(
         matchConfirmationMock
@@ -127,6 +155,7 @@ describe("confirmMatch", () => {
 
   describe("unsuccessful res", () => {
     it("should return null if no ticket was updated on Zendesk", async () => {
+      createMessageMock.mockResolvedValueOnce(sentMessageMock);
       updateTicketMock.mockResolvedValueOnce(null);
 
       const res = await confirmMatch(
@@ -140,6 +169,9 @@ describe("confirmMatch", () => {
     });
 
     it("should return null if no volunteer was updated on Zendesk", async () => {
+      createMessageMock.mockResolvedValueOnce(sentMessageMock);
+      updateTicketMock.mockResolvedValueOnce(msrZendeskTicketMock);
+      prismaMock.supportRequests.update.mockResolvedValue(supportRequestMock);
       updateUserMock.mockResolvedValueOnce(null);
 
       const res = await confirmMatch(
