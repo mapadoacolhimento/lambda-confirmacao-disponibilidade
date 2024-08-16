@@ -1,6 +1,7 @@
 import { prismaMock } from "../../setupTests";
 import {
   createMatchConfirmation,
+  initCap,
   makeVolunteerUnavailable,
   sendWhatsAppMessage,
   updateMsrZendeskTicket,
@@ -183,5 +184,31 @@ describe("sendWhatsAppMessage", () => {
     const res = await sendWhatsAppMessage(volunteerMock, supportRequestMock);
 
     expect(res).toStrictEqual(sentMessageMock);
+  });
+});
+
+describe("initCap", () => {
+  it("should capitalize all words in a upper case string", () => {
+    const upperCaseString = "RIO DE JANEIRO";
+
+    const formattedUpperCaseString = initCap(upperCaseString);
+
+    expect(formattedUpperCaseString).toStrictEqual("Rio De Janeiro");
+  });
+
+  it("should capitalize all words in a lower case string", () => {
+    const lowerCaseString = "rio de janeiro";
+
+    const formattedLowerCaseString = initCap(lowerCaseString);
+
+    expect(formattedLowerCaseString).toStrictEqual("Rio De Janeiro");
+  });
+
+  it("should capitalize all words in a mixed case string", () => {
+    const mixedString = "RiO dE janEIro";
+
+    const formattedMixedString = initCap(mixedString);
+
+    expect(formattedMixedString).toStrictEqual("Rio De Janeiro");
   });
 });

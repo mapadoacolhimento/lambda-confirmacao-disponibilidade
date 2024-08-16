@@ -183,7 +183,7 @@ export async function sendWhatsAppMessage(
   return message;
 }
 
-function initCap(cityName: string) {
+export function initCap(cityName: string) {
   const words = cityName.split(" ");
 
   const cityNameInitCap = words
