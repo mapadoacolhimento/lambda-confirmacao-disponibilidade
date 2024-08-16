@@ -6,3 +6,12 @@ export const ZENDESK_API_TOKEN = process.env["ZENDESK_API_TOKEN"];
 export const ZENDESK_CUSTOM_FIELDS_DICIO = {
   status_acolhimento: 360014379412,
 };
+
+export const TWILIO_ACCOUNT_SID = process.env["TWILIO_ACCOUNT_SID"];
+export const TWILIO_AUTH_TOKEN = process.env["TWILIO_AUTH_TOKEN"];
+
+export const WHATSAPP_TEMPLATE_WITH_CITY_ID =
+  "HX77fce501ec6df2b537d23eee89f330d7";
+export const WHATSAPP_TEMPLATE_WITHOUT_CITY_ID =
+  "HX08285d533e24c762d17ec62b96fdf409";
+export const WHATSAPP_SENDER_ID = "MG079062f161fcf64622214b97dfe44e3c";
