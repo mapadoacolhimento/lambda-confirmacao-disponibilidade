@@ -53,7 +53,34 @@ export default async function handler(
 
     const { supportRequestId, volunteerId, matchType, matchStage } =
       validatedBody;
-    const matchInfo = { matchType, matchStage };
+
+    const volunteer = await client.volunteers.findUnique({
+      where: { id: volunteerId },
+      select: {
+        id: true,
+        firstName: true,
+        phone: true,
+        zendeskUserId: true,
+      },
+    });
+
+    if (!volunteer) {
+      const errorMessage = `Volunteer not found for volunteer_id '${volunteerId}'`;
+
+      return callback(
+        null,
+        notFoundErrorPayload("create-confirmation", errorMessage)
+      );
+    }
+
+    if (!volunteer.phone || volunteer.phone === "not_found") {
+      const errorMessage = `Volunteer without phone information: volunteer_id '${volunteerId}'`;
+
+      return callback(
+        null,
+        notFoundErrorPayload("create-confirmation", errorMessage)
+      );
+    }
 
     const supportRequest = await client.supportRequests.findUnique({
       where: { supportRequestId: supportRequestId },
@@ -61,6 +88,8 @@ export default async function handler(
         supportRequestId: true,
         msrId: true,
         zendeskTicketId: true,
+        city: true,
+        state: true,
       },
     });
 
@@ -91,24 +120,7 @@ export default async function handler(
       );
     }
 
-    const volunteer = await client.volunteers.findUnique({
-      where: { id: volunteerId },
-      select: {
-        id: true,
-        firstName: true,
-        phone: true,
-        zendeskUserId: true,
-      },
-    });
-
-    if (!volunteer) {
-      const errorMessage = `Volunteer not found for volunteer_id '${volunteerId}'`;
-
-      return callback(
-        null,
-        notFoundErrorPayload("create-confirmation", errorMessage)
-      );
-    }
+    const matchInfo = { matchType, matchStage };
 
     const matchConfirmation = await confirmMatch(
       supportRequest,

@@ -1,4 +1,5 @@
 import type {
+  Cities,
   MatchConfirmationStatus,
   Matches,
   MatchStage,
@@ -9,8 +10,10 @@ import type {
   Volunteers,
 } from "@prisma/client";
 import type { ZendeskTicket, ZendeskUser } from "../../types";
+import type { TwilioMessage } from "../../types/Twilio";
 import * as updateTicket from "../../zendeskClient/updateTicket";
 import * as updateUser from "../../zendeskClient/updateUser";
+import * as createMessage from "../../twilioClient/createMessage";
 
 export const supportRequestMock = {
   supportRequestId: 1,
@@ -53,6 +56,11 @@ export const matchConfirmationMock = {
   updatedAt: new Date(),
 };
 
+export const cityMock = {
+  city_value: "SAO PAULO",
+  city_label: "SÃO PAULO",
+} as Cities;
+
 export const matchInfoMock = {
   matchType: "daily",
   matchStage: "ideal",
@@ -77,3 +85,11 @@ export const updatedUserMock = {
     condition: "indisponivel_aguardando_confirmacao",
   },
 } as ZendeskUser;
+
+export const createMessageMock = jest
+  .spyOn(createMessage, "default")
+  .mockImplementation(() => Promise.resolve(null));
+
+export const sentMessageMock = {
+  status: "accepted",
+} as TwilioMessage;

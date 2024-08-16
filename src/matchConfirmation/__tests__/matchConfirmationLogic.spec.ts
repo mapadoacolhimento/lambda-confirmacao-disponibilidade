@@ -2,14 +2,18 @@ import { prismaMock } from "../../setupTests";
 import {
   createMatchConfirmation,
   makeVolunteerUnavailable,
+  sendWhatsAppMessage,
   updateMsrZendeskTicket,
   updateSupportRequest,
 } from "../matchConfirmationLogic";
 import {
+  cityMock,
+  createMessageMock,
   matchConfirmationMock,
   matchInfoMock,
   msrPIIMock,
   msrZendeskTicketMock,
+  sentMessageMock,
   supportRequestMock,
   updatedUserMock,
   updateTicketMock,
@@ -17,6 +21,10 @@ import {
   volunteerAvailabilityMock,
   volunteerMock,
 } from "../__mocks__/utils";
+import {
+  WHATSAPP_TEMPLATE_WITH_CITY_ID,
+  WHATSAPP_TEMPLATE_WITHOUT_CITY_ID,
+} from "../../constants";
 
 describe("createMatchConfirmation", () => {
   it("should create an entry in match_confirmations table and return this entry", async () => {
@@ -117,5 +125,63 @@ describe("makeVolunteerUnavailable", () => {
     const res = await makeVolunteerUnavailable(volunteerMock);
 
     expect(res).toStrictEqual(volunteerMock);
+  });
+});
+
+describe("sendWhatsAppMessage", () => {
+  it("should call createMessage with WHATSAPP_TEMPLATE_WITHOUT_CITY_ID if msr doesn't have city information", async () => {
+    createMessageMock.mockResolvedValueOnce(sentMessageMock);
+
+    await sendWhatsAppMessage(volunteerMock, {
+      ...supportRequestMock,
+      city: "not_found",
+      state: "not_found",
+    });
+
+    expect(createMessageMock).toHaveBeenNthCalledWith(
+      1,
+      WHATSAPP_TEMPLATE_WITHOUT_CITY_ID,
+      volunteerMock.phone,
+      {
+        1: volunteerMock.firstName,
+      }
+    );
+  });
+
+  it("should call createMessage with WHATSAPP_TEMPLATE_WITH_CITY_ID if msr has city information", async () => {
+    createMessageMock.mockResolvedValueOnce(sentMessageMock);
+    prismaMock.cities.findFirst.mockResolvedValue(cityMock);
+
+    await sendWhatsAppMessage(volunteerMock, {
+      ...supportRequestMock,
+      city: "SAO PAULO",
+      state: "SP",
+    });
+
+    expect(createMessageMock).toHaveBeenNthCalledWith(
+      1,
+      WHATSAPP_TEMPLATE_WITH_CITY_ID,
+      volunteerMock.phone,
+      {
+        1: volunteerMock.firstName,
+        2: "São Paulo (SP)",
+      }
+    );
+  });
+
+  it("should throw an error if message wasn't sent", async () => {
+    createMessageMock.mockResolvedValueOnce(null);
+
+    await expect(
+      sendWhatsAppMessage(volunteerMock, supportRequestMock)
+    ).rejects.toThrow("Couldn't send message to volunteer");
+  });
+
+  it("should return the message sent to volunteer", async () => {
+    createMessageMock.mockResolvedValueOnce(sentMessageMock);
+
+    const res = await sendWhatsAppMessage(volunteerMock, supportRequestMock);
+
+    expect(res).toStrictEqual(sentMessageMock);
   });
 });
