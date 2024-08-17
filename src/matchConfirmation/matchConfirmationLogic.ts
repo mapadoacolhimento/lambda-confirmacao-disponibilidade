@@ -81,10 +81,8 @@ export async function updateMsrZendeskTicket(
 export async function makeVolunteerUnavailable(
   volunteer: Pick<Volunteers, "id" | "zendeskUserId">
 ) {
-  if (!volunteer.zendeskUserId) return null;
-
   const volunteerZendeskUser: Pick<ZendeskUser, "id" | "user_fields"> = {
-    id: volunteer.zendeskUserId,
+    id: volunteer.zendeskUserId as bigint,
     user_fields: { condition: "indisponivel_aguardando_confirmacao" },
   };
   const updatedZendeskUser = await updateUser(volunteerZendeskUser);
