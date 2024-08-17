@@ -97,15 +97,6 @@ describe("updateMsrZendeskTicket", () => {
 });
 
 describe("makeVolunteerUnavailable", () => {
-  it("should return null if volunteer zendeskUserId is null", async () => {
-    const res = await makeVolunteerUnavailable({
-      ...volunteerMock,
-      zendeskUserId: null,
-    });
-
-    expect(res).toStrictEqual(null);
-  });
-
   it("should throw an error if no volunteer was updated on Zendesk", async () => {
     updateUserMock.mockResolvedValueOnce(null);
 

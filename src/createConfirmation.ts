@@ -96,6 +96,9 @@ async function fetchMatchConfirmationData(
       phone: {
         not: "not_found",
       },
+      zendeskUserId: {
+        not: null,
+      },
     },
     select: {
       id: true,
