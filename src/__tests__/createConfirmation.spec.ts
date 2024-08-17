@@ -20,11 +20,6 @@ const defaultBody = {
 
 const confirmMatchMock = jest.spyOn(confirmMatch, "default");
 
-const volunteerWithPhoneMock = {
-  ...volunteerMock,
-  phone: "5511123456789",
-};
-
 describe("/create-confitmation endpoint", () => {
   it("should return an error res when no body is provided to the req", async () => {
     await createConfirmation(
@@ -80,9 +75,7 @@ describe("/create-confitmation endpoint", () => {
   });
 
   it("should return an error if support_request wasn't found", async () => {
-    prismaMock.volunteers.findUnique.mockResolvedValueOnce(
-      volunteerWithPhoneMock
-    );
+    prismaMock.volunteers.findUnique.mockResolvedValueOnce(volunteerMock);
     prismaMock.supportRequests.findUniqueOrThrow.mockRejectedValueOnce(
       new Error("support_request not found")
     );
@@ -104,7 +97,7 @@ describe("/create-confitmation endpoint", () => {
 
   it("should call confirmMatch with correct params", async () => {
     prismaMock.volunteers.findUniqueOrThrow.mockResolvedValueOnce(
-      volunteerWithPhoneMock
+      volunteerMock
     );
     prismaMock.supportRequests.findUniqueOrThrow.mockResolvedValueOnce(
       supportRequestMock
@@ -121,14 +114,14 @@ describe("/create-confitmation endpoint", () => {
     expect(confirmMatchMock).toHaveBeenNthCalledWith(
       1,
       supportRequestMock,
-      volunteerWithPhoneMock,
+      volunteerMock,
       matchInfoMock
     );
   });
 
   it("should return an error if the match confirmation wasn't correctly created", async () => {
     prismaMock.volunteers.findUniqueOrThrow.mockResolvedValueOnce(
-      volunteerWithPhoneMock
+      volunteerMock
     );
     prismaMock.supportRequests.findUniqueOrThrow.mockResolvedValueOnce(
       supportRequestMock
@@ -153,7 +146,7 @@ describe("/create-confitmation endpoint", () => {
 
   it("should return the match_confirmation", async () => {
     prismaMock.volunteers.findUniqueOrThrow.mockResolvedValueOnce(
-      volunteerWithPhoneMock
+      volunteerMock
     );
     prismaMock.supportRequests.findUniqueOrThrow.mockResolvedValueOnce(
       supportRequestMock

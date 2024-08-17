@@ -27,6 +27,7 @@ export const volunteerMock = {
   firstName: "Voluntária",
   zendeskUserId: 10 as unknown as bigint,
   condition: "indisponivel_aguardando_confirmacao",
+  phone: "5511123456789",
 } as Volunteers;
 
 export const volunteerAvailabilityMock = {
