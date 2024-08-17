@@ -7,12 +7,7 @@ import { object, number, string } from "yup";
 
 import client from "./prismaClient";
 
-import {
-  getErrorMessage,
-  isJsonString,
-  notFoundErrorPayload,
-  stringfyBigInt,
-} from "./utils";
+import { getErrorMessage, isJsonString, stringfyBigInt } from "./utils";
 import { MatchStage, MatchType } from "@prisma/client";
 import confirmMatch from "./matchConfirmation/confirmMatch";
 
@@ -33,20 +28,8 @@ export default async function handler(
   try {
     const body = event.body;
 
-    if (!body) {
-      const errorMessage = "Empty request body";
-      console.error(`[create-match] - [400]: ${errorMessage}`);
-
-      return callback(null, {
-        statusCode: 400,
-        body: JSON.stringify({
-          error: errorMessage,
-        }),
-      });
-    }
-
     const parsedBody = isJsonString(body)
-      ? (JSON.parse(body) as unknown)
+      ? (JSON.parse(body as string) as unknown)
       : (Object.create(null) as Record<string, unknown>);
 
     const validatedBody = await bodySchema.validate(parsedBody);
@@ -54,77 +37,15 @@ export default async function handler(
     const { supportRequestId, volunteerId, matchType, matchStage } =
       validatedBody;
 
-    const volunteer = await client.volunteers.findUnique({
-      where: { id: volunteerId },
-      select: {
-        id: true,
-        firstName: true,
-        phone: true,
-        zendeskUserId: true,
-      },
-    });
-
-    if (!volunteer) {
-      const errorMessage = `Volunteer not found for volunteer_id '${volunteerId}'`;
-
-      return callback(
-        null,
-        notFoundErrorPayload("create-confirmation", errorMessage)
-      );
-    }
-
-    if (!volunteer.phone || volunteer.phone === "not_found") {
-      const errorMessage = `Volunteer without phone information: volunteer_id '${volunteerId}'`;
-
-      return callback(
-        null,
-        notFoundErrorPayload("create-confirmation", errorMessage)
-      );
-    }
-
-    const supportRequest = await client.supportRequests.findUnique({
-      where: { supportRequestId: supportRequestId },
-      select: {
-        supportRequestId: true,
-        msrId: true,
-        zendeskTicketId: true,
-        city: true,
-        state: true,
-      },
-    });
-
-    if (!supportRequest) {
-      const errorMessage = `support_request not found for support_request_id '${supportRequestId}'`;
-
-      return callback(
-        null,
-        notFoundErrorPayload("create-confirmation", errorMessage)
-      );
-    }
-
-    const msrPII = await client.mSRPiiSec.findUnique({
-      where: { msrId: supportRequest.msrId },
-      select: {
-        msrId: true,
-        email: true,
-        firstName: true,
-      },
-    });
-
-    if (!msrPII) {
-      const errorMessage = `MSR not found for msr_id '${supportRequest.msrId}'`;
-
-      return callback(
-        null,
-        notFoundErrorPayload("create-confirmation", errorMessage)
-      );
-    }
+    const { supportRequest, volunteer } = await fetchMatchConfirmationData(
+      supportRequestId,
+      volunteerId
+    );
 
     const matchInfo = { matchType, matchStage };
 
     const matchConfirmation = await confirmMatch(
       supportRequest,
-      msrPII,
       volunteer,
       matchInfo
     );
@@ -163,4 +84,37 @@ export default async function handler(
       body: JSON.stringify({ error: errorMsg }),
     });
   }
+}
+
+async function fetchMatchConfirmationData(
+  supportRequestId: number,
+  volunteerId: number
+) {
+  const volunteer = await client.volunteers.findUniqueOrThrow({
+    where: {
+      id: volunteerId,
+      phone: {
+        not: "not_found",
+      },
+    },
+    select: {
+      id: true,
+      firstName: true,
+      phone: true,
+      zendeskUserId: true,
+    },
+  });
+
+  const supportRequest = await client.supportRequests.findUniqueOrThrow({
+    where: { supportRequestId: supportRequestId },
+    select: {
+      supportRequestId: true,
+      msrId: true,
+      zendeskTicketId: true,
+      city: true,
+      state: true,
+    },
+  });
+
+  return { supportRequest, volunteer };
 }

@@ -12,7 +12,6 @@ import {
   createMessageMock,
   matchConfirmationMock,
   matchInfoMock,
-  msrPIIMock,
   msrZendeskTicketMock,
   sentMessageMock,
   supportRequestMock,
@@ -34,8 +33,7 @@ describe("createMatchConfirmation", () => {
     );
 
     const res = await createMatchConfirmation(
-      supportRequestMock.supportRequestId,
-      msrPIIMock.msrId,
+      supportRequestMock,
       volunteerMock.id,
       matchInfoMock
     );

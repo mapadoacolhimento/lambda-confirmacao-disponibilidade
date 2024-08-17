@@ -22,16 +22,6 @@ export const supportRequestMock = {
   status: "waiting_for_confirmation" as SupportRequestsStatus,
 } as SupportRequests;
 
-export const msrPIIMock = {
-  msrId: 12345 as unknown as bigint,
-  email: "teste@msr.com",
-  firstName: "teste",
-  phone: "not_found",
-  dateOfBirth: new Date(),
-  createdAt: new Date(),
-  updatedAt: new Date(),
-};
-
 export const volunteerMock = {
   id: 2,
   firstName: "Voluntária",

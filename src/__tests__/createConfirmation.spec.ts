@@ -4,7 +4,6 @@ import { prismaMock } from "../setupTests";
 import {
   matchConfirmationMock,
   matchInfoMock,
-  msrPIIMock,
   supportRequestMock,
   volunteerMock,
 } from "../matchConfirmation/__mocks__";
@@ -38,7 +37,7 @@ describe("/create-confitmation endpoint", () => {
     expect(callback).toHaveBeenCalledWith(null, {
       statusCode: 400,
       body: JSON.stringify({
-        error: "Empty request body",
+        error: "Validation error: matchStage is a required field",
       }),
     });
   });
@@ -62,7 +61,9 @@ describe("/create-confitmation endpoint", () => {
   });
 
   it("should return an error if volunteer wasn't found", async () => {
-    prismaMock.volunteers.findUnique.mockResolvedValueOnce(null);
+    prismaMock.volunteers.findUniqueOrThrow.mockRejectedValueOnce(
+      new Error("volunteer not found")
+    );
     await createConfirmation(
       {
         body: JSON.stringify(defaultBody),
@@ -71,30 +72,9 @@ describe("/create-confitmation endpoint", () => {
       callback
     );
     expect(callback).toHaveBeenCalledWith(null, {
-      statusCode: 404,
+      statusCode: 500,
       body: JSON.stringify({
-        error: `Volunteer not found for volunteer_id '1'`,
-      }),
-    });
-  });
-
-  it("should return an error if volunteer doesn't have phone information", async () => {
-    prismaMock.volunteers.findUnique.mockResolvedValueOnce({
-      ...volunteerMock,
-      phone: "not_found",
-    });
-
-    await createConfirmation(
-      {
-        body: JSON.stringify(defaultBody),
-      } as APIGatewayProxyEvent,
-      {} as Context,
-      callback
-    );
-    expect(callback).toHaveBeenCalledWith(null, {
-      statusCode: 404,
-      body: JSON.stringify({
-        error: `Volunteer without phone information: volunteer_id '1'`,
+        error: `volunteer not found`,
       }),
     });
   });
@@ -103,7 +83,9 @@ describe("/create-confitmation endpoint", () => {
     prismaMock.volunteers.findUnique.mockResolvedValueOnce(
       volunteerWithPhoneMock
     );
-    prismaMock.supportRequests.findUnique.mockResolvedValueOnce(null);
+    prismaMock.supportRequests.findUniqueOrThrow.mockRejectedValueOnce(
+      new Error("support_request not found")
+    );
 
     await createConfirmation(
       {
@@ -113,45 +95,20 @@ describe("/create-confitmation endpoint", () => {
       callback
     );
     expect(callback).toHaveBeenCalledWith(null, {
-      statusCode: 404,
+      statusCode: 500,
       body: JSON.stringify({
-        error: `support_request not found for support_request_id '1'`,
-      }),
-    });
-  });
-
-  it("should return an error if msr_pii wasn't found", async () => {
-    prismaMock.volunteers.findUnique.mockResolvedValueOnce(
-      volunteerWithPhoneMock
-    );
-    prismaMock.supportRequests.findUnique.mockResolvedValueOnce(
-      supportRequestMock
-    );
-    prismaMock.mSRPiiSec.findUnique.mockResolvedValueOnce(null);
-
-    await createConfirmation(
-      {
-        body: JSON.stringify(defaultBody),
-      } as APIGatewayProxyEvent,
-      {} as Context,
-      callback
-    );
-    expect(callback).toHaveBeenCalledWith(null, {
-      statusCode: 404,
-      body: JSON.stringify({
-        error: `MSR not found for msr_id '12345'`,
+        error: `support_request not found`,
       }),
     });
   });
 
   it("should call confirmMatch with correct params", async () => {
-    prismaMock.volunteers.findUnique.mockResolvedValueOnce(
+    prismaMock.volunteers.findUniqueOrThrow.mockResolvedValueOnce(
       volunteerWithPhoneMock
     );
-    prismaMock.supportRequests.findUnique.mockResolvedValueOnce(
+    prismaMock.supportRequests.findUniqueOrThrow.mockResolvedValueOnce(
       supportRequestMock
     );
-    prismaMock.mSRPiiSec.findUnique.mockResolvedValueOnce(msrPIIMock);
 
     await createConfirmation(
       {
@@ -164,20 +121,18 @@ describe("/create-confitmation endpoint", () => {
     expect(confirmMatchMock).toHaveBeenNthCalledWith(
       1,
       supportRequestMock,
-      msrPIIMock,
       volunteerWithPhoneMock,
       matchInfoMock
     );
   });
 
   it("should return an error if the match confirmation wasn't correctly created", async () => {
-    prismaMock.volunteers.findUnique.mockResolvedValueOnce(
+    prismaMock.volunteers.findUniqueOrThrow.mockResolvedValueOnce(
       volunteerWithPhoneMock
     );
-    prismaMock.supportRequests.findUnique.mockResolvedValueOnce(
+    prismaMock.supportRequests.findUniqueOrThrow.mockResolvedValueOnce(
       supportRequestMock
     );
-    prismaMock.mSRPiiSec.findUnique.mockResolvedValueOnce(msrPIIMock);
     confirmMatchMock.mockResolvedValueOnce(null);
 
     await createConfirmation(
@@ -197,13 +152,12 @@ describe("/create-confitmation endpoint", () => {
   });
 
   it("should return the match_confirmation", async () => {
-    prismaMock.volunteers.findUnique.mockResolvedValueOnce(
+    prismaMock.volunteers.findUniqueOrThrow.mockResolvedValueOnce(
       volunteerWithPhoneMock
     );
-    prismaMock.supportRequests.findUnique.mockResolvedValueOnce(
+    prismaMock.supportRequests.findUniqueOrThrow.mockResolvedValueOnce(
       supportRequestMock
     );
-    prismaMock.mSRPiiSec.findUnique.mockResolvedValueOnce(msrPIIMock);
     confirmMatchMock.mockResolvedValueOnce(matchConfirmationMock);
 
     await createConfirmation(

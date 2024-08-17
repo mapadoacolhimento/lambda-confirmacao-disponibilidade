@@ -1,6 +1,6 @@
 import type {
+  MatchConfirmations,
   Matches,
-  MSRPiiSec,
   SupportRequests,
   Volunteers,
 } from "@prisma/client";
@@ -15,33 +15,21 @@ import {
 export default async function confirmMatch(
   supportRequest: Pick<
     SupportRequests,
-    "supportRequestId" | "zendeskTicketId" | "city" | "state"
+    "supportRequestId" | "msrId" | "zendeskTicketId" | "city" | "state"
   >,
-  msrPII: Pick<MSRPiiSec, "msrId">,
   volunteer: Pick<Volunteers, "id" | "firstName" | "zendeskUserId" | "phone">,
   matchInfo: Pick<Matches, "matchType" | "matchStage">
-) {
-  const whatsappMessage = await sendWhatsAppMessage(volunteer, supportRequest);
-  if (!whatsappMessage) return null;
+): Promise<MatchConfirmations | null> {
+  await sendWhatsAppMessage(volunteer, supportRequest);
 
-  const updatedTicket = await updateMsrZendeskTicket(
-    supportRequest.zendeskTicketId,
-    volunteer
-  );
-  if (!updatedTicket) return null;
+  await updateMsrZendeskTicket(supportRequest.zendeskTicketId, volunteer);
 
-  const updatedSupportRequest = await updateSupportRequest(
-    supportRequest.supportRequestId
-  );
-  if (!updatedSupportRequest) return null;
+  await updateSupportRequest(supportRequest.supportRequestId);
 
-  const updatedVolunteer = await makeVolunteerUnavailable(volunteer);
-
-  if (!updatedVolunteer) return null;
+  await makeVolunteerUnavailable(volunteer);
 
   const matchConfirmation = await createMatchConfirmation(
-    supportRequest.supportRequestId,
-    msrPII.msrId,
+    supportRequest,
     volunteer.id,
     matchInfo
   );
