@@ -5,7 +5,6 @@ import {
   createMessageMock,
   matchConfirmationMock,
   matchInfoMock,
-  msrPIIMock,
   msrZendeskTicketMock,
   sentMessageMock,
   supportRequestMock,
@@ -40,148 +39,101 @@ const sendWhatsAppMessageMock = jest.spyOn(
 );
 
 describe("confirmMatch", () => {
-  describe("successful res", () => {
-    it("should call sendWhatsAppMessage with correct params", async () => {
-      createMessageMock.mockResolvedValueOnce(sentMessageMock);
-      await confirmMatch(
-        supportRequestMock,
-        msrPIIMock,
-        volunteerMock,
-        matchInfoMock
-      );
+  it("should call sendWhatsAppMessage with correct params", async () => {
+    createMessageMock.mockResolvedValueOnce(sentMessageMock);
+    updateTicketMock.mockResolvedValueOnce(msrZendeskTicketMock);
+    prismaMock.supportRequests.update.mockResolvedValue(supportRequestMock);
+    updateUserMock.mockResolvedValueOnce(updatedUserMock);
+    makeVolunteerUnavailableMock.mockResolvedValueOnce(volunteerMock);
 
-      expect(sendWhatsAppMessageMock).toHaveBeenNthCalledWith(
-        1,
-        volunteerMock,
-        supportRequestMock
-      );
-    });
+    await confirmMatch(supportRequestMock, volunteerMock, matchInfoMock);
 
-    it("should call updateMsrZendeskTicketMock with correct params", async () => {
-      createMessageMock.mockResolvedValueOnce(sentMessageMock);
-      await confirmMatch(
-        supportRequestMock,
-        msrPIIMock,
-        volunteerMock,
-        matchInfoMock
-      );
-
-      expect(updateMsrZendeskTicketMock).toHaveBeenNthCalledWith(
-        1,
-        supportRequestMock.zendeskTicketId,
-        volunteerMock
-      );
-    });
-
-    it("should call updateSupportRequest with correct params", async () => {
-      createMessageMock.mockResolvedValueOnce(sentMessageMock);
-      updateTicketMock.mockResolvedValueOnce(msrZendeskTicketMock);
-
-      await confirmMatch(
-        supportRequestMock,
-        msrPIIMock,
-        volunteerMock,
-        matchInfoMock
-      );
-
-      expect(updateSupportRequestMock).toHaveBeenNthCalledWith(
-        1,
-        supportRequestMock.supportRequestId
-      );
-    });
-
-    it("should call makeVolunteerUnavailable with correct params", async () => {
-      createMessageMock.mockResolvedValueOnce(sentMessageMock);
-      updateTicketMock.mockResolvedValueOnce(msrZendeskTicketMock);
-      prismaMock.supportRequests.update.mockResolvedValue(supportRequestMock);
-      updateUserMock.mockResolvedValueOnce(updatedUserMock);
-
-      await confirmMatch(
-        supportRequestMock,
-        msrPIIMock,
-        volunteerMock,
-        matchInfoMock
-      );
-
-      expect(makeVolunteerUnavailableMock).toHaveBeenNthCalledWith(
-        1,
-        volunteerMock
-      );
-    });
-
-    it("should call createMatchConfirmation with correct params", async () => {
-      createMessageMock.mockResolvedValueOnce(sentMessageMock);
-      updateTicketMock.mockResolvedValueOnce(msrZendeskTicketMock);
-      prismaMock.supportRequests.update.mockResolvedValue(supportRequestMock);
-      updateUserMock.mockResolvedValueOnce(updatedUserMock);
-      makeVolunteerUnavailableMock.mockResolvedValueOnce(volunteerMock);
-
-      await confirmMatch(
-        supportRequestMock,
-        msrPIIMock,
-        volunteerMock,
-        matchInfoMock
-      );
-
-      expect(createMatchConfimationMock).toHaveBeenNthCalledWith(
-        1,
-        supportRequestMock.supportRequestId,
-        msrPIIMock.msrId,
-        volunteerMock.id,
-        matchInfoMock
-      );
-    });
-
-    it("should return the match_confirmation", async () => {
-      createMessageMock.mockResolvedValueOnce(sentMessageMock);
-      updateTicketMock.mockResolvedValueOnce(msrZendeskTicketMock);
-      prismaMock.matchConfirmations.create.mockResolvedValue(
-        matchConfirmationMock
-      );
-      prismaMock.supportRequests.update.mockResolvedValue(supportRequestMock);
-      updateUserMock.mockResolvedValueOnce(updatedUserMock);
-      makeVolunteerUnavailableMock.mockResolvedValueOnce(volunteerMock);
-
-      const res = await confirmMatch(
-        supportRequestMock,
-        msrPIIMock,
-        volunteerMock,
-        matchInfoMock
-      );
-
-      expect(res).toStrictEqual(matchConfirmationMock);
-    });
+    expect(sendWhatsAppMessageMock).toHaveBeenNthCalledWith(
+      1,
+      volunteerMock,
+      supportRequestMock
+    );
   });
 
-  describe("unsuccessful res", () => {
-    it("should return null if no ticket was updated on Zendesk", async () => {
-      createMessageMock.mockResolvedValueOnce(sentMessageMock);
-      updateTicketMock.mockResolvedValueOnce(null);
+  it("should call updateMsrZendeskTicketMock with correct params", async () => {
+    createMessageMock.mockResolvedValueOnce(sentMessageMock);
+    updateTicketMock.mockResolvedValueOnce(msrZendeskTicketMock);
+    prismaMock.supportRequests.update.mockResolvedValue(supportRequestMock);
+    updateUserMock.mockResolvedValueOnce(updatedUserMock);
+    makeVolunteerUnavailableMock.mockResolvedValueOnce(volunteerMock);
 
-      const res = await confirmMatch(
-        supportRequestMock,
-        msrPIIMock,
-        volunteerMock,
-        matchInfoMock
-      );
+    await confirmMatch(supportRequestMock, volunteerMock, matchInfoMock);
 
-      expect(res).toStrictEqual(null);
-    });
+    expect(updateMsrZendeskTicketMock).toHaveBeenNthCalledWith(
+      1,
+      supportRequestMock.zendeskTicketId,
+      volunteerMock
+    );
+  });
 
-    it("should return null if no volunteer was updated on Zendesk", async () => {
-      createMessageMock.mockResolvedValueOnce(sentMessageMock);
-      updateTicketMock.mockResolvedValueOnce(msrZendeskTicketMock);
-      prismaMock.supportRequests.update.mockResolvedValue(supportRequestMock);
-      updateUserMock.mockResolvedValueOnce(null);
+  it("should call updateSupportRequest with correct params", async () => {
+    createMessageMock.mockResolvedValueOnce(sentMessageMock);
+    updateTicketMock.mockResolvedValueOnce(msrZendeskTicketMock);
+    prismaMock.supportRequests.update.mockResolvedValue(supportRequestMock);
+    updateUserMock.mockResolvedValueOnce(updatedUserMock);
+    makeVolunteerUnavailableMock.mockResolvedValueOnce(volunteerMock);
 
-      const res = await confirmMatch(
-        supportRequestMock,
-        msrPIIMock,
-        volunteerMock,
-        matchInfoMock
-      );
+    await confirmMatch(supportRequestMock, volunteerMock, matchInfoMock);
 
-      expect(res).toStrictEqual(null);
-    });
+    expect(updateSupportRequestMock).toHaveBeenNthCalledWith(
+      1,
+      supportRequestMock.supportRequestId
+    );
+  });
+
+  it("should call makeVolunteerUnavailable with correct params", async () => {
+    createMessageMock.mockResolvedValueOnce(sentMessageMock);
+    updateTicketMock.mockResolvedValueOnce(msrZendeskTicketMock);
+    prismaMock.supportRequests.update.mockResolvedValue(supportRequestMock);
+    updateUserMock.mockResolvedValueOnce(updatedUserMock);
+    makeVolunteerUnavailableMock.mockResolvedValueOnce(volunteerMock);
+
+    await confirmMatch(supportRequestMock, volunteerMock, matchInfoMock);
+
+    expect(makeVolunteerUnavailableMock).toHaveBeenNthCalledWith(
+      1,
+      volunteerMock
+    );
+  });
+
+  it("should call createMatchConfirmation with correct params", async () => {
+    createMessageMock.mockResolvedValueOnce(sentMessageMock);
+    updateTicketMock.mockResolvedValueOnce(msrZendeskTicketMock);
+    prismaMock.supportRequests.update.mockResolvedValue(supportRequestMock);
+    updateUserMock.mockResolvedValueOnce(updatedUserMock);
+    makeVolunteerUnavailableMock.mockResolvedValueOnce(volunteerMock);
+
+    await confirmMatch(supportRequestMock, volunteerMock, matchInfoMock);
+
+    expect(createMatchConfimationMock).toHaveBeenNthCalledWith(
+      1,
+      supportRequestMock,
+      volunteerMock.id,
+      matchInfoMock
+    );
+  });
+
+  it("should return the match_confirmation", async () => {
+    createMessageMock.mockResolvedValueOnce(sentMessageMock);
+    updateTicketMock.mockResolvedValueOnce(msrZendeskTicketMock);
+    prismaMock.matchConfirmations.create.mockResolvedValue(
+      matchConfirmationMock
+    );
+    prismaMock.supportRequests.update.mockResolvedValue(supportRequestMock);
+    updateUserMock.mockResolvedValueOnce(updatedUserMock);
+    makeVolunteerUnavailableMock.mockResolvedValueOnce(volunteerMock);
+
+    const res = await confirmMatch(
+      supportRequestMock,
+      volunteerMock,
+      matchInfoMock
+    );
+
+    expect(res).toStrictEqual(matchConfirmationMock);
   });
 });

@@ -11,15 +11,14 @@ import updateUser from "../zendeskClient/updateUser";
 import createMessage from "../twilioClient/createMessage";
 
 export async function createMatchConfirmation(
-  supportRequestId: number,
-  msrId: bigint,
+  supportRequest: Pick<SupportRequests, "supportRequestId" | "msrId">,
   volunteerId: number,
   matchInfo: Pick<Matches, "matchType" | "matchStage">
 ) {
   const matchConfirmation = await client.matchConfirmations.create({
     data: {
-      supportRequestId: supportRequestId,
-      msrId: msrId,
+      supportRequestId: supportRequest.supportRequestId,
+      msrId: supportRequest.msrId,
       volunteerId: volunteerId,
       status: "waiting",
       matchType: matchInfo.matchType,
