@@ -1,4 +1,4 @@
-export default function paramsToJson(str: string | null) {
+export default function parseParamsToJson(str: string | null) {
   try {
     if (!str) return null;
 

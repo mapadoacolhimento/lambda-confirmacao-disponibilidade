@@ -5,10 +5,13 @@ import type {
 } from "aws-lambda";
 import { object, string } from "yup";
 import { getErrorMessage, stringfyBigInt } from "./utils";
-import paramsToJson from "./utils/paramsToJson";
+import { parseParamsToJson } from "./utils";
 
 const bodySchema = object({
-  SmsMessageSid: string(),
+  MessageSid: string().required(),
+  Body: string().required(),
+  MessageType: string(),
+  ButtonText: string(),
 }).required();
 
 export default async function handler(
@@ -19,13 +22,9 @@ export default async function handler(
   try {
     const body = event.body;
 
-    console.log({ body });
-
-    const parsedBody = body
-      ? (paramsToJson(body) as unknown)
-      : (Object.create(null) as Record<string, unknown>);
-
-    console.log({ parsedBody });
+    const parsedBody =
+      (parseParamsToJson(body) as unknown) ||
+      (Object.create(null) as Record<string, unknown>);
 
     const validatedBody = await bodySchema.validate(parsedBody);
 
