@@ -20,3 +20,11 @@ global.fetch = jest.fn(() =>
     json: () => Promise.resolve({}),
   })
 ) as jest.Mock;
+
+process.env["TWILIO_ACCOUNT_SID"] = "ACXXXX";
+process.env["TWILIO_AUTH_TOKEN"] = "a";
+
+process.env["ZENDESK_SUBDOMAIN"] = "a";
+process.env["ZENDESK_API_URL"] = "a";
+process.env["ZENDESK_API_USER"] = "a";
+process.env["ZENDESK_API_TOKEN"] = "a";
