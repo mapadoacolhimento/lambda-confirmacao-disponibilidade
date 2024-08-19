@@ -6,12 +6,18 @@ import type {
 import { object, string } from "yup";
 import { getErrorMessage, stringfyBigInt } from "./utils";
 import { parseParamsToJson } from "./utils";
+import sendReply from "./reply/sendReply";
 
 const bodySchema = object({
   MessageSid: string().required(),
+  From: string().required(),
   Body: string().required(),
-  MessageType: string(),
-  ButtonText: string(),
+  MessageType: string().required(),
+  ButtonText: string().when("MessageType", {
+    is: "button",
+    then: () => string().required(),
+    otherwise: () => string(),
+  }),
 }).required();
 
 export default async function handler(
@@ -27,6 +33,18 @@ export default async function handler(
       (Object.create(null) as Record<string, unknown>);
 
     const validatedBody = await bodySchema.validate(parsedBody);
+
+    console.log({ validatedBody });
+
+    const {
+      From: from,
+      MessageType: messageType,
+      ButtonText: buttonText,
+    } = validatedBody;
+
+    const reply = sendReply(messageType, from, buttonText);
+
+    console.log(reply);
 
     const bodyRes = JSON.stringify({
       message: stringfyBigInt(validatedBody),

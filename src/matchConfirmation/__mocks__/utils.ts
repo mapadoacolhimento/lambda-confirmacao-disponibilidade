@@ -13,7 +13,7 @@ import type { ZendeskTicket, ZendeskUser } from "../../types";
 import type { TwilioMessage } from "../../types/Twilio";
 import * as updateTicket from "../../zendeskClient/updateTicket";
 import * as updateUser from "../../zendeskClient/updateUser";
-import * as createMessage from "../../twilioClient/createMessage";
+import * as sendTemplateMessage from "../../twilioClient/sendTemplateMessage";
 
 export const supportRequestMock = {
   supportRequestId: 1,
@@ -77,8 +77,8 @@ export const updatedUserMock = {
   },
 } as ZendeskUser;
 
-export const createMessageMock = jest
-  .spyOn(createMessage, "default")
+export const sendTemplateMessageMock = jest
+  .spyOn(sendTemplateMessage, "default")
   .mockImplementation(() => Promise.resolve(null));
 
 export const sentMessageMock = {

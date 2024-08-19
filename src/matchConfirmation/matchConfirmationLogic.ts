@@ -10,7 +10,7 @@ import client from "../prismaClient";
 import updateTicket from "../zendeskClient/updateTicket";
 import type { ZendeskUser } from "../types";
 import updateUser from "../zendeskClient/updateUser";
-import createMessage from "../twilioClient/createMessage";
+import sendTemplateMessage from "../twilioClient/sendTemplateMessage";
 
 export async function createMatchConfirmation(
   supportRequest: Pick<SupportRequests, "supportRequestId" | "msrId">,
@@ -142,7 +142,7 @@ export async function sendWhatsAppMessage(
       1: volunteer.firstName,
     };
 
-    const message = await createMessage(
+    const message = await sendTemplateMessage(
       WHATSAPP_TEMPLATE_WITHOUT_CITY_ID,
       volunteer.phone,
       contentVariables
@@ -177,7 +177,7 @@ export async function sendWhatsAppMessage(
     2: cityPrettyName,
   };
 
-  const message = await createMessage(
+  const message = await sendTemplateMessage(
     WHATSAPP_TEMPLATE_WITH_CITY_ID,
     volunteer.phone,
     contentVariables
