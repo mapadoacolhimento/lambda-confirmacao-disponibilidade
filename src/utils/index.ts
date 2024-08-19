@@ -5,4 +5,5 @@ export { default as isJsonString } from "./isJsonString";
 export { default as isProduction } from "./isProduction";
 export { default as encrypt } from "./encrypt";
 export { default as notFoundErrorPayload } from "./notFoundErrorPayload";
+export { default as parseParamsToJson } from "./parseParamsToJson";
 export * from "./stringfyBigInt";
