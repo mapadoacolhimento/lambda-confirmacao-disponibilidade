@@ -13,7 +13,7 @@ const callback = jest.fn();
 
 const defaultBody = {
   supportRequestId: 1,
-  volunteerId: 1,
+  volunteerId: 2,
   matchType: "daily",
   matchStage: "ideal",
 };
@@ -139,7 +139,7 @@ describe("/create-confitmation endpoint", () => {
     expect(callback).toHaveBeenCalledWith(null, {
       statusCode: 500,
       body: JSON.stringify({
-        error: `Couldn't create match confirmation`,
+        error: `Couldn't create match confirmation for support_request_id ${supportRequestMock.supportRequestId} and volunteer_id ${volunteerMock.id}`,
       }),
     });
   });
