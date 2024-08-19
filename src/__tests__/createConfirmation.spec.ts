@@ -20,7 +20,7 @@ const defaultBody = {
 
 const confirmMatchMock = jest.spyOn(confirmMatch, "default");
 
-describe("/create-confitmation endpoint", () => {
+describe("/create-confirmation endpoint", () => {
   it("should return an error res when no body is provided to the req", async () => {
     await createConfirmation(
       {

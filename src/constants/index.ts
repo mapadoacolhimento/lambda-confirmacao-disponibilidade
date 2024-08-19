@@ -1,3 +1,4 @@
+//ZENDESK
 export const ZENDESK_SUBDOMAIN = process.env["ZENDESK_SUBDOMAIN"];
 export const ZENDESK_API_URL = `${ZENDESK_SUBDOMAIN}/api/v2`;
 export const ZENDESK_API_USER = `${process.env["ZENDESK_API_USER"]}/token`;
@@ -12,11 +13,31 @@ export const ZENDESK_TICKET_WAITING_FOR_CONFIRMATION_STATUS =
 export const ZENDESK_USER_WAITING_FOR_CONFIRMATION_STATUS =
   "indisponivel_aguardando_confirmacao";
 
+// TWILIO
 export const TWILIO_ACCOUNT_SID = process.env["TWILIO_ACCOUNT_SID"];
 export const TWILIO_AUTH_TOKEN = process.env["TWILIO_AUTH_TOKEN"];
 
+// WHATSAPP
 export const WHATSAPP_TEMPLATE_WITH_CITY_ID =
   "HX77fce501ec6df2b537d23eee89f330d7";
 export const WHATSAPP_TEMPLATE_WITHOUT_CITY_ID =
   "HX08285d533e24c762d17ec62b96fdf409";
 export const WHATSAPP_SENDER_ID = "***REMOVED***";
+export const WHATSAPP_GENERIC_REPLY = `Você está em um canal de mensagens automáticas. Mas saiba que estamos aqui para ajudar!
+
+Se precisar conversar com alguém da nossa equipe, por favor, sinta-se à vontade para nos contatar pelo e-mail: voluntaria@mapadoacolhimento.org`;
+export const WHATSAPP_POSITIVE_REPLY = `Obrigada por confirmar sua disponibilidade! 💜 Vamos compartilhar seu contato com a acolhida. Agora é só aguardar o contato dela para que vocês iniciem o atendimento!
+
+📩 *Pedimos que fique atenta ao seu e-mail, pois as próximas atualizações serão enviadas por lá!*`;
+// precisamos utilizar um template para a negativa, pois a mensagem possui botões
+export const WHATSAPP_NEGATIVE_REPLY_TEMPLATE_ID =
+  "HX0933a196163d79735d6ec3871672ce14";
+export const WHATSAPP_CONTINUE_AVAILABLE_REPLY = `Obrigada pelo seu retorno! Em breve você receberá outras oportunidades de atendimento. 💜`;
+export const WHATSAPP_UNREGISTRATION_REPLY_TEMPLATE_ID =
+  "HX3ccc5212f22ecc0dbb2d27096374fb2c";
+
+// VOLUNTEER ANSWERS
+export const POSITIVE_ANSWER = "Sim";
+export const NEGATIVE_ANSWER = "Não";
+export const CONTINUE_AVAILABLE_ANSWER = "É+um+caso+pontual";
+export const UNREGISTRATION_ANSWER = "Quero+descadastrar";

@@ -2,10 +2,10 @@ import * as confirmationLogic from "../matchConfirmationLogic";
 import confirmMatch from "../confirmMatch";
 import { prismaMock } from "../../setupTests";
 import {
-  createMessageMock,
   matchConfirmationMock,
   matchInfoMock,
   msrZendeskTicketMock,
+  sendTemplateMessageMock,
   sentMessageMock,
   supportRequestMock,
   updatedUserMock,
@@ -40,7 +40,7 @@ const sendWhatsAppMessageMock = jest.spyOn(
 
 describe("confirmMatch", () => {
   beforeEach(() => {
-    createMessageMock.mockResolvedValueOnce(sentMessageMock);
+    sendTemplateMessageMock.mockResolvedValueOnce(sentMessageMock);
     updateTicketMock.mockResolvedValueOnce(msrZendeskTicketMock);
     prismaMock.supportRequests.update.mockResolvedValue(supportRequestMock);
     updateUserMock.mockResolvedValueOnce(updatedUserMock);
