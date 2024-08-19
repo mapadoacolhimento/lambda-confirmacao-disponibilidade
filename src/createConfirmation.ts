@@ -51,7 +51,9 @@ export default async function handler(
     );
 
     if (!matchConfirmation)
-      throw new Error("Couldn't create match confirmation");
+      throw new Error(
+        `Couldn't create match confirmation for support_request_id ${supportRequestId} and volunteer_id ${volunteerId}`
+      );
 
     const bodyRes = JSON.stringify({
       message: stringfyBigInt(matchConfirmation),
@@ -66,7 +68,7 @@ export default async function handler(
     if (error["name"] === "ValidationError") {
       const errorMsg = `Validation error: ${getErrorMessage(error)}`;
 
-      console.error(`[create-match] - [400]: ${errorMsg}`);
+      console.error(`[create-match-confirmation] - [400]: ${errorMsg}`);
 
       return callback(null, {
         statusCode: 400,
@@ -77,7 +79,7 @@ export default async function handler(
     }
 
     const errorMsg = getErrorMessage(error);
-    console.error(`[create-match] - [500]: ${errorMsg}`);
+    console.error(`[create-match-confirmation] - [500]: ${errorMsg}`);
 
     return callback(null, {
       statusCode: 500,

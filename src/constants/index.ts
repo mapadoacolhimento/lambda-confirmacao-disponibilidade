@@ -7,6 +7,11 @@ export const ZENDESK_CUSTOM_FIELDS_DICIO = {
   status_acolhimento: 360014379412,
 };
 
+export const ZENDESK_TICKET_WAITING_FOR_CONFIRMATION_STATUS =
+  "encaminhamento__aguardando_confirmação";
+export const ZENDESK_USER_WAITING_FOR_CONFIRMATION_STATUS =
+  "indisponivel_aguardando_confirmacao";
+
 export const TWILIO_ACCOUNT_SID = process.env["TWILIO_ACCOUNT_SID"];
 export const TWILIO_AUTH_TOKEN = process.env["TWILIO_AUTH_TOKEN"];
 

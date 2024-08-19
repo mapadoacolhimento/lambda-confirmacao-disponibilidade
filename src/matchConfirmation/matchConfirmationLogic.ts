@@ -3,6 +3,8 @@ import {
   WHATSAPP_TEMPLATE_WITH_CITY_ID,
   WHATSAPP_TEMPLATE_WITHOUT_CITY_ID,
   ZENDESK_CUSTOM_FIELDS_DICIO,
+  ZENDESK_TICKET_WAITING_FOR_CONFIRMATION_STATUS,
+  ZENDESK_USER_WAITING_FOR_CONFIRMATION_STATUS,
 } from "../constants";
 import client from "../prismaClient";
 import updateTicket from "../zendeskClient/updateTicket";
@@ -62,7 +64,7 @@ export async function updateMsrZendeskTicket(
     custom_fields: [
       {
         id: ZENDESK_CUSTOM_FIELDS_DICIO["status_acolhimento"],
-        value: "encaminhamento__aguardando_confirmação",
+        value: ZENDESK_TICKET_WAITING_FOR_CONFIRMATION_STATUS,
       },
     ],
     comment: {
@@ -73,7 +75,10 @@ export async function updateMsrZendeskTicket(
 
   const zendeskTicket = await updateTicket(ticket);
 
-  if (!zendeskTicket) throw new Error("Couldn't update msr Zendesk ticket");
+  if (!zendeskTicket)
+    throw new Error(
+      `Couldn't update msr Zendesk ticket for zendesk_ticket_id: ${zendeskTicketId}`
+    );
 
   return zendeskTicket;
 }
@@ -83,12 +88,14 @@ export async function makeVolunteerUnavailable(
 ) {
   const volunteerZendeskUser: Pick<ZendeskUser, "id" | "user_fields"> = {
     id: volunteer.zendeskUserId as bigint,
-    user_fields: { condition: "indisponivel_aguardando_confirmacao" },
+    user_fields: { condition: ZENDESK_USER_WAITING_FOR_CONFIRMATION_STATUS },
   };
   const updatedZendeskUser = await updateUser(volunteerZendeskUser);
 
   if (!updatedZendeskUser)
-    throw new Error("Couldn't update volunteer Zendesk status");
+    throw new Error(
+      `Couldn't update volunteer Zendesk status for zendesk_user_id: ${volunteer.zendeskUserId} `
+    );
 
   const updatedVolunteer = await client.volunteers.update({
     where: {
@@ -121,14 +128,14 @@ export async function makeVolunteerUnavailable(
 }
 
 export async function sendWhatsAppMessage(
-  volunteer: Pick<Volunteers, "firstName" | "phone">,
+  volunteer: Pick<Volunteers, "id" | "firstName" | "phone">,
   supportRequest: Pick<SupportRequests, "city" | "state">
 ) {
   const msrHasCity =
-    !!supportRequest.city &&
-    supportRequest.city != "not_found" &&
-    !!supportRequest.state &&
-    supportRequest.state != "not_found";
+    supportRequest.city &&
+    supportRequest.city !== "not_found" &&
+    supportRequest.state &&
+    supportRequest.state !== "not_found";
 
   if (!msrHasCity) {
     const contentVariables = {
@@ -142,7 +149,9 @@ export async function sendWhatsAppMessage(
     );
 
     if (!message || message.status != "accepted")
-      throw new Error("Couldn't send message to volunteer");
+      throw new Error(
+        `Couldn't send whatsapp message to volunteer for volunteer_id: ${volunteer.id}`
+      );
 
     return message;
   }
@@ -175,7 +184,9 @@ export async function sendWhatsAppMessage(
   );
 
   if (!message || message.status != "accepted")
-    throw new Error("Couldn't send message to volunteer");
+    throw new Error(
+      `Couldn't send whatsapp message to volunteer for volunteer_id: ${volunteer.id}`
+    );
 
   return message;
 }

@@ -164,7 +164,9 @@ describe("sendWhatsAppMessage", () => {
 
     await expect(
       sendWhatsAppMessage(volunteerMock, supportRequestMock)
-    ).rejects.toThrow("Couldn't send message to volunteer");
+    ).rejects.toThrow(
+      `Couldn't send whatsapp message to volunteer for volunteer_id: ${volunteerMock.id}`
+    );
   });
 
   it("should return the message sent to volunteer", async () => {
