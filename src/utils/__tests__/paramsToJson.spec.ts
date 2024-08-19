@@ -26,4 +26,16 @@ describe("paramsToJson()", () => {
     const res = paramsToJson(str);
     expect(res).toStrictEqual(json);
   });
+
+  it("should return null if string isn't valid", () => {
+    const str = "a";
+
+    expect(paramsToJson(str)).toStrictEqual(null);
+  });
+
+  it("should return null if string is null", () => {
+    const str = null;
+
+    expect(paramsToJson(str)).toStrictEqual(null);
+  });
 });
