@@ -1,130 +1,97 @@
-import type { TwilioMessage } from "../../types";
+import * as cleanPhone from "../../utils/cleanPhone";
+import sendReply from "../sendReply";
 import {
-  WHATSAPP_CONTINUE_AVAILABLE_REPLY,
-  WHATSAPP_GENERIC_REPLY,
-  WHATSAPP_NEGATIVE_REPLY_TEMPLATE_ID,
-  WHATSAPP_POSITIVE_REPLY,
-  WHATSAPP_UNREGISTRATION_REPLY_TEMPLATE_ID,
-} from "../../constants";
-import * as sendOpenReply from "../../twilioClient/sendOpenReply";
-import * as sendTemplateMessage from "../../twilioClient/sendTemplateMessage";
-import {
-  sendContinueAvailableReply,
-  sendGenericReply,
-  sendNegativeReply,
-  sendPositiveReply,
-  sendUnregistrationReply,
-} from "../sendReply";
+  replyMock,
+  sendOpenReplyMock,
+  sendTemplateMessageMock,
+  volunteerPhoneMock,
+} from "../__mocks__";
+import * as replyLogic from "../replyLogic";
 
-const volunteerPhoneMock = "5511123456789";
+const volunteerFrom = "whatsapp%3A%2B5511123456789";
 
-const replyMock = {
-  status: "accepted",
-} as TwilioMessage;
+const cleanPhoneMock = jest.spyOn(cleanPhone, "default");
 
-const sendOpenReplyMock = jest
-  .spyOn(sendOpenReply, "default")
-  .mockImplementation(() => Promise.resolve(null));
+const sendPositiveReplyMock = jest.spyOn(replyLogic, "sendPositiveReply");
 
-const sendTemplateMessageMock = jest
-  .spyOn(sendTemplateMessage, "default")
-  .mockImplementation(() => Promise.resolve(null));
+const sendNegativeReplyMock = jest.spyOn(replyLogic, "sendNegativeReply");
 
-describe("sendReply functions", () => {
+const sendContinueAvailableReplyMock = jest.spyOn(
+  replyLogic,
+  "sendContinueAvailableReply"
+);
+
+const sendUnregistrationReplyMock = jest.spyOn(
+  replyLogic,
+  "sendUnregistrationReply"
+);
+
+const sendGenericReplyMock = jest.spyOn(replyLogic, "sendGenericReply");
+
+describe("sendReply", () => {
   beforeEach(() => {
     sendOpenReplyMock.mockResolvedValue(replyMock);
     sendTemplateMessageMock.mockResolvedValue(replyMock);
   });
 
-  describe("sendGenericReply", () => {
-    it("should call sendOpenReply with correct params", async () => {
-      await sendGenericReply(volunteerPhoneMock);
+  it("should call cleanPhone with correct params", async () => {
+    await sendReply("button", volunteerFrom, "Sim");
 
-      expect(sendOpenReplyMock).toHaveBeenNthCalledWith(
-        1,
-        WHATSAPP_GENERIC_REPLY,
-        volunteerPhoneMock
-      );
-    });
-
-    it("should return the reply that was sent", async () => {
-      const res = await sendGenericReply(volunteerPhoneMock);
-
-      expect(res).toStrictEqual(replyMock);
-    });
+    expect(cleanPhoneMock).toHaveBeenNthCalledWith(1, volunteerFrom);
   });
 
-  describe("sendPositiveReply", () => {
-    it("should call sendOpenReply with correct params", async () => {
-      await sendPositiveReply(volunteerPhoneMock);
+  it("should call sendPositiveReply with correct params", async () => {
+    await sendReply("button", volunteerFrom, "Sim");
 
-      expect(sendOpenReplyMock).toHaveBeenNthCalledWith(
-        1,
-        WHATSAPP_POSITIVE_REPLY,
-        volunteerPhoneMock
-      );
-    });
-
-    it("should return the reply that was sent", async () => {
-      const res = await sendPositiveReply(volunteerPhoneMock);
-
-      expect(res).toStrictEqual(replyMock);
-    });
+    expect(sendPositiveReplyMock).toHaveBeenNthCalledWith(
+      1,
+      volunteerPhoneMock
+    );
   });
 
-  describe("sendNegativeReply", () => {
-    it("should call sendTemplateMessag with correct params", async () => {
-      await sendNegativeReply(volunteerPhoneMock);
+  it("should call sendNegativeReply with correct params", async () => {
+    await sendReply("button", volunteerFrom, "Não");
 
-      expect(sendTemplateMessageMock).toHaveBeenNthCalledWith(
-        1,
-        WHATSAPP_NEGATIVE_REPLY_TEMPLATE_ID,
-        volunteerPhoneMock,
-        {}
-      );
-    });
-
-    it("should return the reply that was sent", async () => {
-      const res = await sendNegativeReply(volunteerPhoneMock);
-
-      expect(res).toStrictEqual(replyMock);
-    });
+    expect(sendNegativeReplyMock).toHaveBeenNthCalledWith(
+      1,
+      volunteerPhoneMock
+    );
   });
 
-  describe("sendContinueAvailableReply", () => {
-    it("should call sendOpenReply with correct params", async () => {
-      await sendContinueAvailableReply(volunteerPhoneMock);
+  it("should call sendContinueAvailableReply with correct params", async () => {
+    await sendReply("interactive", volunteerFrom, "É+um+caso+pontual");
 
-      expect(sendOpenReplyMock).toHaveBeenNthCalledWith(
-        1,
-        WHATSAPP_CONTINUE_AVAILABLE_REPLY,
-        volunteerPhoneMock
-      );
-    });
-
-    it("should return the reply that was sent", async () => {
-      const res = await sendContinueAvailableReply(volunteerPhoneMock);
-
-      expect(res).toStrictEqual(replyMock);
-    });
+    expect(sendContinueAvailableReplyMock).toHaveBeenNthCalledWith(
+      1,
+      volunteerPhoneMock
+    );
   });
 
-  describe("sendUnregistrationReply", () => {
-    it("should call sendTemplateMessag with correct params", async () => {
-      await sendUnregistrationReply(volunteerPhoneMock);
+  it("should call sendUnregistrationReply with correct params", async () => {
+    await sendReply("interactive", volunteerFrom, "Quero+descadastrar");
 
-      expect(sendTemplateMessageMock).toHaveBeenNthCalledWith(
-        1,
-        WHATSAPP_UNREGISTRATION_REPLY_TEMPLATE_ID,
-        volunteerPhoneMock,
-        {}
-      );
-    });
+    expect(sendUnregistrationReplyMock).toHaveBeenNthCalledWith(
+      1,
+      volunteerPhoneMock
+    );
+  });
 
-    it("should return the reply that was sent", async () => {
-      const res = await sendUnregistrationReply(volunteerPhoneMock);
+  it("should call sendGenericReply with correct params", async () => {
+    await sendReply("text", volunteerFrom, "Oi");
 
-      expect(res).toStrictEqual(replyMock);
-    });
+    expect(sendGenericReplyMock).toHaveBeenNthCalledWith(1, volunteerPhoneMock);
+  });
+
+  it("should return null if the reply wasn't sent", async () => {
+    sendOpenReplyMock.mockResolvedValue(null);
+    const res = await sendReply("text", volunteerFrom, "Oi");
+
+    expect(res).toStrictEqual(null);
+  });
+
+  it("should return the reply that was sent", async () => {
+    const res = await sendReply("text", volunteerFrom, "Oi");
+
+    expect(res).toStrictEqual(replyMock);
   });
 });
