@@ -10,11 +10,15 @@ import sendTemplateMessage from "../twilioClient/sendTemplateMessage";
 
 export async function sendGenericReply(phone: string) {
   const message = await sendOpenReply(WHATSAPP_GENERIC_REPLY, phone);
+  if (!message || message.status != "accepted")
+    throw new Error(`Couldn't send whatsapp message to phone: ${phone}`);
   return message;
 }
 
 export async function sendPositiveReply(phone: string) {
   const message = await sendOpenReply(WHATSAPP_POSITIVE_REPLY, phone);
+  if (!message || message.status != "accepted")
+    throw new Error(`Couldn't send whatsapp message to phone: ${phone}`);
   return message;
 }
 
@@ -25,11 +29,15 @@ export async function sendNegativeReply(phone: string) {
     phone,
     contentVariables
   );
+  if (!message || message.status != "accepted")
+    throw new Error(`Couldn't send whatsapp message to phone: ${phone}`);
   return message;
 }
 
 export async function sendContinueAvailableReply(phone: string) {
   const message = await sendOpenReply(WHATSAPP_CONTINUE_AVAILABLE_REPLY, phone);
+  if (!message || message.status != "accepted")
+    throw new Error(`Couldn't send whatsapp message to phone: ${phone}`);
   return message;
 }
 
@@ -40,5 +48,7 @@ export async function sendUnregistrationReply(phone: string) {
     phone,
     contentVariables
   );
+  if (!message || message.status != "accepted")
+    throw new Error(`Couldn't send whatsapp message to phone: ${phone}`);
   return message;
 }
