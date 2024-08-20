@@ -45,17 +45,17 @@ export default async function sendReply(
   return reply;
 }
 
-async function sendGenericReply(phone: string) {
+export async function sendGenericReply(phone: string) {
   const message = await sendOpenReply(WHATSAPP_GENERIC_REPLY, phone);
   return message;
 }
 
-async function sendPositiveReply(phone: string) {
+export async function sendPositiveReply(phone: string) {
   const message = await sendOpenReply(WHATSAPP_POSITIVE_REPLY, phone);
   return message;
 }
 
-async function sendNegativeReply(phone: string) {
+export async function sendNegativeReply(phone: string) {
   const contentVariables = {};
   const message = await sendTemplateMessage(
     WHATSAPP_NEGATIVE_REPLY_TEMPLATE_ID,
@@ -65,12 +65,12 @@ async function sendNegativeReply(phone: string) {
   return message;
 }
 
-async function sendContinueAvailableReply(phone: string) {
+export async function sendContinueAvailableReply(phone: string) {
   const message = await sendOpenReply(WHATSAPP_CONTINUE_AVAILABLE_REPLY, phone);
   return message;
 }
 
-async function sendUnregistrationReply(phone: string) {
+export async function sendUnregistrationReply(phone: string) {
   const contentVariables = {};
   const message = await sendTemplateMessage(
     WHATSAPP_UNREGISTRATION_REPLY_TEMPLATE_ID,
