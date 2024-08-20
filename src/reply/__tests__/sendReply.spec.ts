@@ -82,13 +82,6 @@ describe("sendReply", () => {
     expect(sendGenericReplyMock).toHaveBeenNthCalledWith(1, volunteerPhoneMock);
   });
 
-  it("should return null if the reply wasn't sent", async () => {
-    sendOpenReplyMock.mockResolvedValue(null);
-    const res = await sendReply("text", volunteerFrom, "Oi");
-
-    expect(res).toStrictEqual(null);
-  });
-
   it("should return the reply that was sent", async () => {
     const res = await sendReply("text", volunteerFrom, "Oi");
 

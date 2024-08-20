@@ -36,6 +36,14 @@ describe("replyLogic", () => {
       );
     });
 
+    it("should throw an error if message wasn't sent", async () => {
+      sendOpenReplyMock.mockResolvedValueOnce(null);
+
+      await expect(sendGenericReply(volunteerPhoneMock)).rejects.toThrow(
+        `Couldn't send whatsapp message to phone: ${volunteerPhoneMock}`
+      );
+    });
+
     it("should return the reply that was sent", async () => {
       const res = await sendGenericReply(volunteerPhoneMock);
 
@@ -51,6 +59,14 @@ describe("replyLogic", () => {
         1,
         WHATSAPP_POSITIVE_REPLY,
         volunteerPhoneMock
+      );
+    });
+
+    it("should throw an error if message wasn't sent", async () => {
+      sendOpenReplyMock.mockResolvedValueOnce(null);
+
+      await expect(sendPositiveReply(volunteerPhoneMock)).rejects.toThrow(
+        `Couldn't send whatsapp message to phone: ${volunteerPhoneMock}`
       );
     });
 
@@ -73,6 +89,14 @@ describe("replyLogic", () => {
       );
     });
 
+    it("should throw an error if message wasn't sent", async () => {
+      sendTemplateMessageMock.mockResolvedValueOnce(null);
+
+      await expect(sendNegativeReply(volunteerPhoneMock)).rejects.toThrow(
+        `Couldn't send whatsapp message to phone: ${volunteerPhoneMock}`
+      );
+    });
+
     it("should return the reply that was sent", async () => {
       const res = await sendNegativeReply(volunteerPhoneMock);
 
@@ -88,6 +112,16 @@ describe("replyLogic", () => {
         1,
         WHATSAPP_CONTINUE_AVAILABLE_REPLY,
         volunteerPhoneMock
+      );
+    });
+
+    it("should throw an error if message wasn't sent", async () => {
+      sendOpenReplyMock.mockResolvedValueOnce(null);
+
+      await expect(
+        sendContinueAvailableReply(volunteerPhoneMock)
+      ).rejects.toThrow(
+        `Couldn't send whatsapp message to phone: ${volunteerPhoneMock}`
       );
     });
 
@@ -107,6 +141,14 @@ describe("replyLogic", () => {
         WHATSAPP_UNREGISTRATION_REPLY_TEMPLATE_ID,
         volunteerPhoneMock,
         {}
+      );
+    });
+
+    it("should throw an error if message wasn't sent", async () => {
+      sendTemplateMessageMock.mockResolvedValueOnce(null);
+
+      await expect(sendUnregistrationReply(volunteerPhoneMock)).rejects.toThrow(
+        `Couldn't send whatsapp message to phone: ${volunteerPhoneMock}`
       );
     });
 

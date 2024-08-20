@@ -34,20 +34,18 @@ export default async function handler(
 
     const validatedBody = await bodySchema.validate(parsedBody);
 
-    console.log({ validatedBody });
-
     const {
       From: from,
       MessageType: messageType,
       ButtonText: buttonText,
     } = validatedBody;
 
-    const reply = sendReply(messageType, from, buttonText);
+    const reply = await sendReply(messageType, from, buttonText);
 
-    console.log(reply);
+    if (!reply) throw new Error(`Couldn't send reply to phone number: ${from}`);
 
     const bodyRes = JSON.stringify({
-      message: stringfyBigInt(validatedBody),
+      message: stringfyBigInt(reply),
     });
 
     return callback(null, {
