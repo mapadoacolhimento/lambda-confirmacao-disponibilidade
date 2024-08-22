@@ -1,9 +1,4 @@
-import {
-  CONTINUE_AVAILABLE_ANSWER,
-  NEGATIVE_ANSWER,
-  POSITIVE_ANSWER,
-  UNREGISTRATION_ANSWER,
-} from "../constants";
+import { ButtonText, type TwilioMessage } from "../types";
 import { cleanPhone } from "../utils";
 import {
   sendContinueAvailableReply,
@@ -14,33 +9,26 @@ import {
 } from "./replyLogic";
 
 export default async function sendReply(
-  messageType: string,
   phone: string,
-  buttonText: string | undefined
-) {
+  buttonText?: ButtonText
+): Promise<TwilioMessage> {
   const cleanedPhone = cleanPhone(phone);
-  let reply = null;
 
-  if (messageType === "button") {
-    if (buttonText === POSITIVE_ANSWER)
-      reply = await sendPositiveReply(cleanedPhone);
-
-    if (buttonText === NEGATIVE_ANSWER)
-      reply = await sendNegativeReply(cleanedPhone);
-
+  if (!buttonText) {
+    const reply = await sendGenericReply(cleanedPhone);
     return reply;
   }
 
-  if (messageType === "interactive") {
-    if (buttonText === CONTINUE_AVAILABLE_ANSWER)
-      reply = await sendContinueAvailableReply(cleanedPhone);
+  const ANSWER_TYPES = {
+    [ButtonText.positive]: sendPositiveReply,
+    [ButtonText.negative]: sendNegativeReply,
+    [ButtonText.continue]: sendContinueAvailableReply,
+    [ButtonText.unregistration]: sendUnregistrationReply,
+  };
 
-    if (buttonText === UNREGISTRATION_ANSWER)
-      reply = await sendUnregistrationReply(cleanedPhone);
+  const sendReply = ANSWER_TYPES[buttonText] || sendGenericReply;
 
-    return reply;
-  }
+  const reply = await sendReply(cleanedPhone);
 
-  reply = await sendGenericReply(cleanedPhone);
   return reply;
 }
