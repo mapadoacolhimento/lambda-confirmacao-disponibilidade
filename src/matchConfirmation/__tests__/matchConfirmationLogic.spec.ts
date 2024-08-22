@@ -9,10 +9,10 @@ import {
 } from "../matchConfirmationLogic";
 import {
   cityMock,
-  createMessageMock,
   matchConfirmationMock,
   matchInfoMock,
   msrZendeskTicketMock,
+  sendTemplateMessageMock,
   sentMessageMock,
   supportRequestMock,
   updatedUserMock,
@@ -120,7 +120,7 @@ describe("makeVolunteerUnavailable", () => {
 
 describe("sendWhatsAppMessage", () => {
   it("should call createMessage with WHATSAPP_TEMPLATE_WITHOUT_CITY_ID if msr doesn't have city information", async () => {
-    createMessageMock.mockResolvedValueOnce(sentMessageMock);
+    sendTemplateMessageMock.mockResolvedValueOnce(sentMessageMock);
 
     await sendWhatsAppMessage(volunteerMock, {
       ...supportRequestMock,
@@ -128,7 +128,7 @@ describe("sendWhatsAppMessage", () => {
       state: "not_found",
     });
 
-    expect(createMessageMock).toHaveBeenNthCalledWith(
+    expect(sendTemplateMessageMock).toHaveBeenNthCalledWith(
       1,
       WHATSAPP_TEMPLATE_WITHOUT_CITY_ID,
       volunteerMock.phone,
@@ -139,7 +139,7 @@ describe("sendWhatsAppMessage", () => {
   });
 
   it("should call createMessage with WHATSAPP_TEMPLATE_WITH_CITY_ID if msr has city information", async () => {
-    createMessageMock.mockResolvedValueOnce(sentMessageMock);
+    sendTemplateMessageMock.mockResolvedValueOnce(sentMessageMock);
     prismaMock.cities.findFirst.mockResolvedValue(cityMock);
 
     await sendWhatsAppMessage(volunteerMock, {
@@ -148,7 +148,7 @@ describe("sendWhatsAppMessage", () => {
       state: "SP",
     });
 
-    expect(createMessageMock).toHaveBeenNthCalledWith(
+    expect(sendTemplateMessageMock).toHaveBeenNthCalledWith(
       1,
       WHATSAPP_TEMPLATE_WITH_CITY_ID,
       volunteerMock.phone,
@@ -160,7 +160,7 @@ describe("sendWhatsAppMessage", () => {
   });
 
   it("should throw an error if message wasn't sent", async () => {
-    createMessageMock.mockResolvedValueOnce(null);
+    sendTemplateMessageMock.mockResolvedValueOnce(null);
 
     await expect(
       sendWhatsAppMessage(volunteerMock, supportRequestMock)
@@ -170,7 +170,7 @@ describe("sendWhatsAppMessage", () => {
   });
 
   it("should return the message sent to volunteer", async () => {
-    createMessageMock.mockResolvedValueOnce(sentMessageMock);
+    sendTemplateMessageMock.mockResolvedValueOnce(sentMessageMock);
 
     const res = await sendWhatsAppMessage(volunteerMock, supportRequestMock);
 

@@ -1,17 +1,11 @@
-import {
-  TWILIO_ACCOUNT_SID,
-  TWILIO_AUTH_TOKEN,
-  WHATSAPP_SENDER_ID,
-} from "../constants";
+import twilioClient from ".";
+import { WHATSAPP_SENDER_ID } from "../constants";
 import type { TwilioMessage } from "../types/Twilio";
-import twilio from "twilio";
 
-const twilioClient = twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
-
-export default async function createMessage(
+export default async function sendTemplateMessage(
   templateId: string,
   phone: string,
-  contentVariables: Record<number, string>
+  contentVariables: Record<number, string> | null
 ): Promise<TwilioMessage | null> {
   const message = await twilioClient.messages.create({
     contentSid: templateId,

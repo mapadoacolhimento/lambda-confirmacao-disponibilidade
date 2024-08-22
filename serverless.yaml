@@ -74,6 +74,14 @@ functions:
           authorizer:
             name: auth
             type: request
+  
+  handleAnswer:
+    handler: handler.handleAnswer
+    timeout: 30
+    events:
+      - httpApi:
+          path: /handle-answer
+          method: POST
 
 plugins:
   - serverless-webpack
