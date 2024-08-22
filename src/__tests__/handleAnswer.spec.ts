@@ -22,7 +22,7 @@ describe("/handle-answer endpoint", () => {
     expect(callback).toHaveBeenCalledWith(null, {
       statusCode: 400,
       body: JSON.stringify({
-        error: "Validation error: MessageType is a required field",
+        error: "Validation error: From is a required field",
       }),
     });
   });
@@ -40,7 +40,7 @@ describe("/handle-answer endpoint", () => {
     expect(callback).toHaveBeenCalledWith(null, {
       statusCode: 400,
       body: JSON.stringify({
-        error: `Validation error: MessageType is a required field`,
+        error: `Validation error: From is a required field`,
       }),
     });
   });
@@ -56,14 +56,15 @@ describe("/handle-answer endpoint", () => {
 
     expect(sendReplyMock).toHaveBeenNthCalledWith(
       1,
-      "text",
       "whatsapp%3A%2B5511123456789",
       undefined
     );
   });
 
   it("should return an error if the reply wasn't correctly sent", async () => {
-    sendReplyMock.mockResolvedValueOnce(null);
+    sendReplyMock.mockRejectedValue(
+      new Error(`Couldn't send whatsapp message to phone: 5511123456789`)
+    );
 
     await handleAnswer(
       {
@@ -76,7 +77,7 @@ describe("/handle-answer endpoint", () => {
     expect(callback).toHaveBeenCalledWith(null, {
       statusCode: 500,
       body: JSON.stringify({
-        error: `Couldn't send reply to phone number: whatsapp%3A%2B5511123456789`,
+        error: `Couldn't send whatsapp message to phone: 5511123456789`,
       }),
     });
   });

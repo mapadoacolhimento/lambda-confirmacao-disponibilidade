@@ -4,20 +4,14 @@ import type {
   APIGatewayProxyCallback,
 } from "aws-lambda";
 import { object, string } from "yup";
-import { getErrorMessage, stringfyBigInt } from "./utils";
-import { parseParamsToJson } from "./utils";
+import { getErrorMessage, stringfyBigInt, parseParamsToJson } from "./utils";
 import sendReply from "./reply/sendReply";
+import { ButtonText } from "./types";
 
 const bodySchema = object({
   MessageSid: string().required(),
   From: string().required(),
-  Body: string().required(),
-  MessageType: string().required(),
-  ButtonText: string().when("MessageType", {
-    is: "button",
-    then: () => string().required(),
-    otherwise: () => string(),
-  }),
+  ButtonText: string().oneOf(Object.values(ButtonText)),
 }).required();
 
 export default async function handler(
@@ -34,15 +28,9 @@ export default async function handler(
 
     const validatedBody = await bodySchema.validate(parsedBody);
 
-    const {
-      From: from,
-      MessageType: messageType,
-      ButtonText: buttonText,
-    } = validatedBody;
+    const { From: from, ButtonText: buttonText } = validatedBody;
 
-    const reply = await sendReply(messageType, from, buttonText);
-
-    if (!reply) throw new Error(`Couldn't send reply to phone number: ${from}`);
+    const reply = await sendReply(from, buttonText);
 
     const bodyRes = JSON.stringify({
       message: stringfyBigInt(reply),
