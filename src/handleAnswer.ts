@@ -12,6 +12,7 @@ const bodySchema = object({
   MessageSid: string().required(),
   From: string().required(),
   ButtonText: string().oneOf(Object.values(ButtonText)),
+  ButtonPayload: string(),
 }).required();
 
 export default async function handler(

@@ -5,7 +5,7 @@ import type { TwilioMessage } from "../types/Twilio";
 export default async function sendTemplateMessage(
   templateId: string,
   phone: string,
-  contentVariables: Record<number, string> | null
+  contentVariables: Record<string, string> | null
 ): Promise<TwilioMessage | null> {
   const message = await twilioClient.messages.create({
     contentSid: templateId,

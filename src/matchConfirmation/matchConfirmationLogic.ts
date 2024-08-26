@@ -129,8 +129,14 @@ export async function makeVolunteerUnavailable(
 
 export async function sendWhatsAppMessage(
   volunteer: Pick<Volunteers, "id" | "firstName" | "phone">,
-  supportRequest: Pick<SupportRequests, "city" | "state">
+  supportRequest: Pick<SupportRequests, "city" | "state">,
+  matchConfirmationId: number
 ) {
+  const contentVariables = {
+    volunteerName: volunteer.firstName,
+    matchConfirmationId: matchConfirmationId.toString(),
+  };
+
   const msrHasCity =
     supportRequest.city &&
     supportRequest.city !== "not_found" &&
@@ -138,10 +144,6 @@ export async function sendWhatsAppMessage(
     supportRequest.state !== "not_found";
 
   if (!msrHasCity) {
-    const contentVariables = {
-      1: volunteer.firstName,
-    };
-
     const message = await sendTemplateMessage(
       WHATSAPP_TEMPLATE_WITHOUT_CITY_ID,
       volunteer.phone,
@@ -172,15 +174,13 @@ export async function sendWhatsAppMessage(
     supportRequest.state +
     ")";
 
-  const contentVariables = {
-    1: volunteer.firstName,
-    2: cityPrettyName,
-  };
-
   const message = await sendTemplateMessage(
     WHATSAPP_TEMPLATE_WITH_CITY_ID,
     volunteer.phone,
-    contentVariables
+    {
+      ...contentVariables,
+      msrCity: cityPrettyName,
+    }
   );
 
   if (!message || message.status != "accepted")

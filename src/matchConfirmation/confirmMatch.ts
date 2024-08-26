@@ -20,19 +20,23 @@ export default async function confirmMatch(
   volunteer: Pick<Volunteers, "id" | "firstName" | "zendeskUserId" | "phone">,
   matchInfo: Pick<Matches, "matchType" | "matchStage">
 ): Promise<MatchConfirmations | null> {
-  await sendWhatsAppMessage(volunteer, supportRequest);
+  const matchConfirmation = await createMatchConfirmation(
+    supportRequest,
+    volunteer.id,
+    matchInfo
+  );
+
+  await sendWhatsAppMessage(
+    volunteer,
+    supportRequest,
+    matchConfirmation.matchConfirmationId
+  );
 
   await updateMsrZendeskTicket(supportRequest.zendeskTicketId, volunteer);
 
   await updateSupportRequest(supportRequest.supportRequestId);
 
   await makeVolunteerUnavailable(volunteer);
-
-  const matchConfirmation = await createMatchConfirmation(
-    supportRequest,
-    volunteer.id,
-    matchInfo
-  );
 
   return matchConfirmation;
 }

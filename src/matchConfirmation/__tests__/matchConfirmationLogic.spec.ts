@@ -122,18 +122,24 @@ describe("sendWhatsAppMessage", () => {
   it("should call createMessage with WHATSAPP_TEMPLATE_WITHOUT_CITY_ID if msr doesn't have city information", async () => {
     sendTemplateMessageMock.mockResolvedValueOnce(sentMessageMock);
 
-    await sendWhatsAppMessage(volunteerMock, {
-      ...supportRequestMock,
-      city: "not_found",
-      state: "not_found",
-    });
+    await sendWhatsAppMessage(
+      volunteerMock,
+      {
+        ...supportRequestMock,
+        city: "not_found",
+        state: "not_found",
+      },
+      matchConfirmationMock.matchConfirmationId
+    );
 
     expect(sendTemplateMessageMock).toHaveBeenNthCalledWith(
       1,
       WHATSAPP_TEMPLATE_WITHOUT_CITY_ID,
       volunteerMock.phone,
       {
-        1: volunteerMock.firstName,
+        volunteerName: volunteerMock.firstName,
+        matchConfirmationId:
+          matchConfirmationMock.matchConfirmationId.toString(),
       }
     );
   });
@@ -142,19 +148,25 @@ describe("sendWhatsAppMessage", () => {
     sendTemplateMessageMock.mockResolvedValueOnce(sentMessageMock);
     prismaMock.cities.findFirst.mockResolvedValue(cityMock);
 
-    await sendWhatsAppMessage(volunteerMock, {
-      ...supportRequestMock,
-      city: "SAO PAULO",
-      state: "SP",
-    });
+    await sendWhatsAppMessage(
+      volunteerMock,
+      {
+        ...supportRequestMock,
+        city: "SAO PAULO",
+        state: "SP",
+      },
+      matchConfirmationMock.matchConfirmationId
+    );
 
     expect(sendTemplateMessageMock).toHaveBeenNthCalledWith(
       1,
       WHATSAPP_TEMPLATE_WITH_CITY_ID,
       volunteerMock.phone,
       {
-        1: volunteerMock.firstName,
-        2: "São Paulo (SP)",
+        volunteerName: volunteerMock.firstName,
+        matchConfirmationId:
+          matchConfirmationMock.matchConfirmationId.toString(),
+        msrCity: "São Paulo (SP)",
       }
     );
   });
@@ -163,7 +175,11 @@ describe("sendWhatsAppMessage", () => {
     sendTemplateMessageMock.mockResolvedValueOnce(null);
 
     await expect(
-      sendWhatsAppMessage(volunteerMock, supportRequestMock)
+      sendWhatsAppMessage(
+        volunteerMock,
+        supportRequestMock,
+        matchConfirmationMock.matchConfirmationId
+      )
     ).rejects.toThrow(
       `Couldn't send whatsapp message to volunteer for volunteer_id: ${volunteerMock.id}`
     );
@@ -172,7 +188,11 @@ describe("sendWhatsAppMessage", () => {
   it("should return the message sent to volunteer", async () => {
     sendTemplateMessageMock.mockResolvedValueOnce(sentMessageMock);
 
-    const res = await sendWhatsAppMessage(volunteerMock, supportRequestMock);
+    const res = await sendWhatsAppMessage(
+      volunteerMock,
+      supportRequestMock,
+      matchConfirmationMock.matchConfirmationId
+    );
 
     expect(res).toStrictEqual(sentMessageMock);
   });
