@@ -1,7 +1,9 @@
+import acceptMatch from "../matchAccepted/acceptMatch";
 import { ButtonText, type TwilioMessage } from "../types";
 import { cleanPhone } from "../utils";
 import {
   sendContinueAvailableReply,
+  sendErrorReply,
   sendGenericReply,
   sendNegativeReply,
   sendPositiveReply,
@@ -10,7 +12,8 @@ import {
 
 export default async function sendReply(
   phone: string,
-  buttonText?: ButtonText
+  buttonText?: ButtonText,
+  buttonPayload?: string
 ): Promise<TwilioMessage> {
   const cleanedPhone = cleanPhone(phone);
 
@@ -29,6 +32,16 @@ export default async function sendReply(
   const sendReply = ANSWER_TYPES[buttonText] || sendGenericReply;
 
   const reply = await sendReply(cleanedPhone);
+
+  const shouldAcceptMatch =
+    !!buttonPayload && buttonText === ButtonText.positive;
+  if (shouldAcceptMatch) {
+    const match = await acceptMatch(buttonPayload);
+    if (!match) {
+      const reply = await sendErrorReply(cleanedPhone);
+      return reply;
+    }
+  }
 
   return reply;
 }

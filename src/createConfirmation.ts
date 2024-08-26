@@ -4,10 +4,12 @@ import type {
   APIGatewayProxyCallback,
 } from "aws-lambda";
 import { object, number, string } from "yup";
-
-import client from "./prismaClient";
-
-import { getErrorMessage, isJsonString, stringfyBigInt } from "./utils";
+import {
+  fetchSupportRequestAndVolunteer,
+  getErrorMessage,
+  isJsonString,
+  stringfyBigInt,
+} from "./utils";
 import { MatchStage, MatchType } from "@prisma/client";
 import confirmMatch from "./matchConfirmation/confirmMatch";
 
@@ -37,7 +39,7 @@ export default async function handler(
     const { supportRequestId, volunteerId, matchType, matchStage } =
       validatedBody;
 
-    const { supportRequest, volunteer } = await fetchMatchConfirmationData(
+    const { supportRequest, volunteer } = await fetchSupportRequestAndVolunteer(
       supportRequestId,
       volunteerId
     );
@@ -86,40 +88,4 @@ export default async function handler(
       body: JSON.stringify({ error: errorMsg }),
     });
   }
-}
-
-async function fetchMatchConfirmationData(
-  supportRequestId: number,
-  volunteerId: number
-) {
-  const volunteer = await client.volunteers.findUniqueOrThrow({
-    where: {
-      id: volunteerId,
-      phone: {
-        not: "not_found",
-      },
-      zendeskUserId: {
-        not: null,
-      },
-    },
-    select: {
-      id: true,
-      firstName: true,
-      phone: true,
-      zendeskUserId: true,
-    },
-  });
-
-  const supportRequest = await client.supportRequests.findUniqueOrThrow({
-    where: { supportRequestId: supportRequestId },
-    select: {
-      supportRequestId: true,
-      msrId: true,
-      zendeskTicketId: true,
-      city: true,
-      state: true,
-    },
-  });
-
-  return { supportRequest, volunteer };
 }

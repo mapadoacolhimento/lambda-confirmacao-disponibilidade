@@ -29,9 +29,13 @@ export default async function handler(
 
     const validatedBody = await bodySchema.validate(parsedBody);
 
-    const { From: from, ButtonText: buttonText } = validatedBody;
+    const {
+      From: from,
+      ButtonText: buttonText,
+      ButtonPayload: buttonPayload,
+    } = validatedBody;
 
-    const reply = await sendReply(from, buttonText);
+    const reply = await sendReply(from, buttonText, buttonPayload);
 
     const bodyRes = JSON.stringify({
       message: stringfyBigInt(reply),

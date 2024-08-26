@@ -57,6 +57,7 @@ describe("/handle-answer endpoint", () => {
     expect(sendReplyMock).toHaveBeenNthCalledWith(
       1,
       "whatsapp%3A%2B5511123456789",
+      undefined,
       undefined
     );
   });
