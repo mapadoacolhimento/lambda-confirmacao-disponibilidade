@@ -12,6 +12,42 @@ import type { ZendeskUser } from "../types";
 import updateUser from "../zendeskClient/updateUser";
 import sendTemplateMessage from "../twilioClient/sendTemplateMessage";
 
+export async function fetchSupportRequestAndVolunteer(
+  supportRequestId: number,
+  volunteerId: number
+) {
+  const volunteer = await client.volunteers.findUniqueOrThrow({
+    where: {
+      id: volunteerId,
+      phone: {
+        not: "not_found",
+      },
+      zendeskUserId: {
+        not: null,
+      },
+    },
+    select: {
+      id: true,
+      firstName: true,
+      phone: true,
+      zendeskUserId: true,
+    },
+  });
+
+  const supportRequest = await client.supportRequests.findUniqueOrThrow({
+    where: { supportRequestId: supportRequestId },
+    select: {
+      supportRequestId: true,
+      msrId: true,
+      zendeskTicketId: true,
+      city: true,
+      state: true,
+    },
+  });
+
+  return { supportRequest, volunteer };
+}
+
 export async function createMatchConfirmation(
   supportRequest: Pick<SupportRequests, "supportRequestId" | "msrId">,
   volunteerId: number,
@@ -201,4 +237,26 @@ export function initCap(cityName: string) {
     .join(" ");
 
   return cityNameInitCap;
+}
+
+export function getMatchConfirmationId(buttonPayload: string) {
+  const matchConfirmationId = Number(buttonPayload.split("_")[1]);
+  return matchConfirmationId;
+}
+
+export async function fetchMatchConfirmation(matchConfirmationId: number) {
+  const matchConfirmation = await client.matchConfirmations.findUniqueOrThrow({
+    where: {
+      matchConfirmationId: matchConfirmationId,
+      status: "waiting",
+    },
+    select: {
+      matchConfirmationId: true,
+      supportRequestId: true,
+      volunteerId: true,
+      matchType: true,
+      matchStage: true,
+    },
+  });
+  return matchConfirmation;
 }

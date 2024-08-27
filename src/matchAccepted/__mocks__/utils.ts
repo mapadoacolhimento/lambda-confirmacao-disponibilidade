@@ -33,8 +33,6 @@ export const matchResponseMock = {
   json: async () => Promise.resolve(matchDataMock),
 } as Response;
 
-export const buttonPayloadMock = "yes_12345";
-
 export const createMatchMock = jest.spyOn(matchAcceptedLogic, "createMatch");
 export const authenticateMatchMock = jest.spyOn(
   matchAcceptedLogic,

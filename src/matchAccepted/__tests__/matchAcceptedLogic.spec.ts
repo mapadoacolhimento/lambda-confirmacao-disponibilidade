@@ -8,7 +8,6 @@ import {
 } from "../../matchConfirmation/__mocks__";
 import {
   authResponseMock,
-  buttonPayloadMock,
   fetchMock,
   matchMock,
   matchResponseMock,
@@ -16,17 +15,8 @@ import {
 import {
   authenticateMatch,
   createMatch,
-  getMatchConfirmationId,
   updateTicketWithConfirmation,
 } from "../matchAcceptedLogic";
-
-describe("getMatchConfirmationId", () => {
-  it("should get the matchConfirmationId from the buttonPayload string", () => {
-    const res = getMatchConfirmationId(buttonPayloadMock);
-
-    expect(res).toStrictEqual(12345);
-  });
-});
 
 describe("updateTicketWithConfirmation", () => {
   it("should call updateTicket with correct params", async () => {

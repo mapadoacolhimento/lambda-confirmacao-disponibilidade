@@ -7,5 +7,4 @@ export { default as encrypt } from "./encrypt";
 export { default as notFoundErrorPayload } from "./notFoundErrorPayload";
 export { default as parseParamsToJson } from "./parseParamsToJson";
 export { default as cleanPhone } from "./cleanPhone";
-export { default as fetchSupportRequestAndVolunteer } from "./fetchSupportRequestAndVolunteer";
 export * from "./stringfyBigInt";

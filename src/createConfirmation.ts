@@ -4,14 +4,10 @@ import type {
   APIGatewayProxyCallback,
 } from "aws-lambda";
 import { object, number, string } from "yup";
-import {
-  fetchSupportRequestAndVolunteer,
-  getErrorMessage,
-  isJsonString,
-  stringfyBigInt,
-} from "./utils";
+import { getErrorMessage, isJsonString, stringfyBigInt } from "./utils";
 import { MatchStage, MatchType } from "@prisma/client";
 import confirmMatch from "./matchConfirmation/confirmMatch";
+import { fetchSupportRequestAndVolunteer } from "./matchConfirmation/matchConfirmationLogic";
 
 const bodySchema = object({
   supportRequestId: number().required(),

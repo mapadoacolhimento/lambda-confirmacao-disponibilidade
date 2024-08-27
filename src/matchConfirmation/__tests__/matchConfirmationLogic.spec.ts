@@ -1,6 +1,7 @@
 import { prismaMock } from "../../setupTests";
 import {
   createMatchConfirmation,
+  getMatchConfirmationId,
   initCap,
   makeVolunteerUnavailable,
   sendWhatsAppMessage,
@@ -221,5 +222,14 @@ describe("initCap", () => {
     const formattedMixedString = initCap(mixedString);
 
     expect(formattedMixedString).toStrictEqual("Rio De Janeiro");
+  });
+});
+
+describe("getMatchConfirmationId", () => {
+  it("should get the matchConfirmationId from the buttonPayload string", () => {
+    const buttonPayloadMock = "yes_12345";
+    const res = getMatchConfirmationId(buttonPayloadMock);
+
+    expect(res).toStrictEqual(12345);
   });
 });

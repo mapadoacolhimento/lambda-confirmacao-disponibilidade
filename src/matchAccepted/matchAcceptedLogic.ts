@@ -3,28 +3,6 @@ import { LAMBDA_MATCH_URL } from "../constants";
 import client from "../prismaClient";
 import updateTicket from "../zendeskClient/updateTicket";
 
-export function getMatchConfirmationId(buttonPayload: string) {
-  const matchConfirmationId = Number(buttonPayload.split("_")[1]);
-  return matchConfirmationId;
-}
-
-export async function fetchMatchConfirmation(matchConfirmationId: number) {
-  const matchConfirmation = await client.matchConfirmations.findUniqueOrThrow({
-    where: {
-      matchConfirmationId: matchConfirmationId,
-      status: "waiting",
-    },
-    select: {
-      matchConfirmationId: true,
-      supportRequestId: true,
-      volunteerId: true,
-      matchType: true,
-      matchStage: true,
-    },
-  });
-  return matchConfirmation;
-}
-
 export async function confirmMatchConfirmation(
   matchConfirmationId: number,
   matchId: number
