@@ -1,5 +1,6 @@
 import { fetchSupportRequestAndVolunteer } from "../utils";
 import {
+  authenticateMatch,
   confirmMatchConfirmation,
   createMatch,
   fetchMatchConfirmation,
@@ -11,7 +12,6 @@ export default async function acceptMatch(buttonPayload: string) {
   const matchConfirmationId = getMatchConfirmationId(buttonPayload);
 
   const matchConfirmation = await fetchMatchConfirmation(matchConfirmationId);
-  if (!matchConfirmation) return null;
 
   const { supportRequest, volunteer } = await fetchSupportRequestAndVolunteer(
     matchConfirmation.supportRequestId,
@@ -20,12 +20,12 @@ export default async function acceptMatch(buttonPayload: string) {
 
   await updateTicketWithConfirmation(supportRequest.zendeskTicketId, volunteer);
 
-  await confirmMatchConfirmation(matchConfirmation.matchConfirmationId);
+  const authToken = await authenticateMatch();
 
-  const match = await createMatch(
-    matchConfirmation.supportRequestId,
-    matchConfirmation.volunteerId
+  const match = await createMatch(matchConfirmation, authToken);
+
+  await confirmMatchConfirmation(
+    matchConfirmation.matchConfirmationId,
+    match.matchId
   );
-
-  return match;
 }

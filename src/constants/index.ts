@@ -31,10 +31,6 @@ export const WHATSAPP_GENERIC_REPLY = `Você está em um canal de mensagens auto
 
 Se precisar conversar com alguém da nossa equipe, por favor, sinta-se à vontade para nos contatar pelo e-mail: voluntaria@mapadoacolhimento.org`;
 
-export const WHATSAPP_ERROR_REPLY = `Ops! Parece que algo deu errado com essa solicitação.
-
-Por favor, entre em contato com nossa equipe pelo e-mail: voluntaria@mapadoacolhimento.org`;
-
 export const WHATSAPP_POSITIVE_REPLY = `Obrigada por confirmar sua disponibilidade! 💜 Vamos compartilhar seu contato com a acolhida. Agora é só aguardar o contato dela para que vocês iniciem o atendimento!
 
 📩 *Pedimos que fique atenta ao seu e-mail, pois as próximas atualizações serão enviadas por lá!*`;

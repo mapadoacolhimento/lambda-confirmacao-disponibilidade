@@ -1,4 +1,4 @@
-import type { Matches, Volunteers } from "@prisma/client";
+import type { MatchConfirmations, Matches, Volunteers } from "@prisma/client";
 import { LAMBDA_MATCH_URL } from "../constants";
 import client from "../prismaClient";
 import updateTicket from "../zendeskClient/updateTicket";
@@ -9,22 +9,33 @@ export function getMatchConfirmationId(buttonPayload: string) {
 }
 
 export async function fetchMatchConfirmation(matchConfirmationId: number) {
-  const matchConfirmation = await client.matchConfirmations.findUnique({
+  const matchConfirmation = await client.matchConfirmations.findUniqueOrThrow({
     where: {
       matchConfirmationId: matchConfirmationId,
       status: "waiting",
+    },
+    select: {
+      matchConfirmationId: true,
+      supportRequestId: true,
+      volunteerId: true,
+      matchType: true,
+      matchStage: true,
     },
   });
   return matchConfirmation;
 }
 
-export async function confirmMatchConfirmation(matchConfirmationId: number) {
+export async function confirmMatchConfirmation(
+  matchConfirmationId: number,
+  matchId: number
+) {
   await client.matchConfirmations.update({
     where: {
       matchConfirmationId: matchConfirmationId,
     },
     data: {
       status: "confirmed",
+      matchId: matchId,
       updatedAt: new Date().toISOString(),
     },
   });
@@ -58,7 +69,7 @@ export async function updateTicketWithConfirmation(
     );
 }
 
-async function authenticateMatch() {
+export async function authenticateMatch() {
   const authResponse = await fetch(LAMBDA_MATCH_URL + "/sign");
   if (authResponse.status !== 200 || !authResponse.ok) {
     throw new Error(authResponse.statusText);
@@ -69,18 +80,19 @@ async function authenticateMatch() {
 }
 
 export async function createMatch(
-  supportRequestId: number,
-  volunteerId: number
+  matchConfirmation: Pick<
+    MatchConfirmations,
+    "supportRequestId" | "volunteerId" | "matchType" | "matchStage"
+  >,
+  authToken: string
 ) {
-  const authToken = await authenticateMatch();
-
   const options = {
     method: "POST",
     body: JSON.stringify({
-      supportRequestId: supportRequestId,
-      volunteerId: volunteerId,
-      matchType: "daily",
-      matchStage: "ideal",
+      supportRequestId: matchConfirmation.supportRequestId,
+      volunteerId: matchConfirmation.volunteerId,
+      matchType: matchConfirmation.matchType,
+      matchStage: matchConfirmation.matchStage,
     }),
     headers: {
       "Content-Type": "application/json",
