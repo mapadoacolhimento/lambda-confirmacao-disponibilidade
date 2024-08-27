@@ -1,14 +1,21 @@
 import type { APIGatewayProxyEvent, Context } from "aws-lambda";
 import { handleAnswer } from "../../handler";
 import * as sendReply from "../reply/sendReply";
+import * as processMatchConfirmation from "../matchConfirmation/processMatchConfirmation";
 import { replyMock } from "../reply/__mocks__";
 
 const callback = jest.fn();
 
 const defaultBody =
   "MessageType=text&Body=Oi&MessageSid=SM802c0d39a503aae472cee7379abff9f6&From=whatsapp%3A%2B5511123456789";
+const positiveAnswerBody =
+  "MessageType=button&Body=Sim&MessageSid=SM802c0d39a503aae472cee7379abff9f6&From=whatsapp%3A%2B5511123456789&ButtonText=Sim&ButtonPayload=yes_12345";
 
 const sendReplyMock = jest.spyOn(sendReply, "default");
+const processMatchConfirmationMock = jest.spyOn(
+  processMatchConfirmation,
+  "default"
+);
 
 describe("/handle-answer endpoint", () => {
   it("should return an error res when no body is provided to the req", async () => {
@@ -80,6 +87,23 @@ describe("/handle-answer endpoint", () => {
         error: `Couldn't send whatsapp message to phone: 5511123456789`,
       }),
     });
+  });
+
+  it("should call processMatchConfirmation with correct params when volunteer has answered positively", async () => {
+    sendReplyMock.mockResolvedValueOnce(replyMock);
+    await handleAnswer(
+      {
+        body: positiveAnswerBody,
+      } as APIGatewayProxyEvent,
+      {} as Context,
+      callback
+    );
+
+    expect(processMatchConfirmationMock).toHaveBeenNthCalledWith(
+      1,
+      "Sim",
+      "yes_12345"
+    );
   });
 
   it("should return the reply", async () => {
