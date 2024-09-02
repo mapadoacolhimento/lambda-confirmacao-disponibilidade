@@ -42,6 +42,13 @@ provider:
   environment:
     JWT_SECRET: ${env:JWT_SECRET}
     DATABASE_URL: ${env:DATABASE_URL}
+    LAMBDA_MATCH_URL: ${env:LAMBDA_MATCH_URL}
+    ZENDESK_SUBDOMAIN: ${env:ZENDESK_SUBDOMAIN}
+    ZENDESK_API_USER: ${env:ZENDESK_API_USER}
+    ZENDESK_API_TOKEN: ${env:ZENDESK_API_TOKEN}
+    TWILIO_ACCOUNT_SID: ${env:TWILIO_ACCOUNT_SID}
+    TWILIO_AUTH_TOKEN: ${env:TWILIO_AUTH_TOKEN}
+    TWILIO_MESSAGING_SID: ${env:TWILIO_MESSAGING_SID}
 
 functions:
   auth:
@@ -63,7 +70,7 @@ functions:
           authorizer:
             name: auth
             type: request
-  
+
   createConfirmation:
     handler: handler.createConfirmation
     timeout: 30
@@ -74,7 +81,7 @@ functions:
           authorizer:
             name: auth
             type: request
-  
+
   handleAnswer:
     handler: handler.handleAnswer
     timeout: 30

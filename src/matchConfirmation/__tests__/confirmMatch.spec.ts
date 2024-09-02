@@ -45,6 +45,9 @@ describe("confirmMatch", () => {
     prismaMock.supportRequests.update.mockResolvedValue(supportRequestMock);
     updateUserMock.mockResolvedValueOnce(updatedUserMock);
     makeVolunteerUnavailableMock.mockResolvedValueOnce(volunteerMock);
+    prismaMock.matchConfirmations.create.mockResolvedValue(
+      matchConfirmationMock
+    );
   });
 
   it("should call sendWhatsAppMessage with correct params", async () => {
@@ -53,7 +56,8 @@ describe("confirmMatch", () => {
     expect(sendWhatsAppMessageMock).toHaveBeenNthCalledWith(
       1,
       volunteerMock,
-      supportRequestMock
+      supportRequestMock,
+      matchConfirmationMock.matchConfirmationId
     );
   });
 
@@ -97,10 +101,6 @@ describe("confirmMatch", () => {
   });
 
   it("should return the match_confirmation", async () => {
-    prismaMock.matchConfirmations.create.mockResolvedValue(
-      matchConfirmationMock
-    );
-
     const res = await confirmMatch(
       supportRequestMock,
       volunteerMock,

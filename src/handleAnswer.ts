@@ -7,11 +7,13 @@ import { object, string } from "yup";
 import { getErrorMessage, stringfyBigInt, parseParamsToJson } from "./utils";
 import sendReply from "./reply/sendReply";
 import { ButtonText } from "./types";
+import processMatchConfirmation from "./matchConfirmation/processMatchConfirmation";
 
 const bodySchema = object({
   MessageSid: string().required(),
   From: string().required(),
   ButtonText: string().oneOf(Object.values(ButtonText)),
+  ButtonPayload: string(),
 }).required();
 
 export default async function handler(
@@ -28,9 +30,16 @@ export default async function handler(
 
     const validatedBody = await bodySchema.validate(parsedBody);
 
-    const { From: from, ButtonText: buttonText } = validatedBody;
+    const {
+      From: from,
+      ButtonText: buttonText,
+      ButtonPayload: buttonPayload,
+    } = validatedBody;
 
     const reply = await sendReply(from, buttonText);
+
+    if (buttonText && buttonPayload)
+      await processMatchConfirmation(buttonText, buttonPayload);
 
     const bodyRes = JSON.stringify({
       message: stringfyBigInt(reply),

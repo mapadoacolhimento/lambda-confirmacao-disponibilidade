@@ -1,3 +1,6 @@
+// LAMBDA MATCH
+export const LAMBDA_MATCH_URL = process.env["LAMBDA_MATCH_URL"];
+
 //ZENDESK
 export const ZENDESK_SUBDOMAIN = process.env["ZENDESK_SUBDOMAIN"];
 export const ZENDESK_API_URL = `${ZENDESK_SUBDOMAIN}/api/v2`;
@@ -19,13 +22,15 @@ export const TWILIO_AUTH_TOKEN = process.env["TWILIO_AUTH_TOKEN"];
 
 // WHATSAPP
 export const WHATSAPP_TEMPLATE_WITH_CITY_ID =
-  "HX77fce501ec6df2b537d23eee89f330d7";
+  "HXf970ed7554838224e3dd22103cb9afef";
 export const WHATSAPP_TEMPLATE_WITHOUT_CITY_ID =
-  "HX08285d533e24c762d17ec62b96fdf409";
-export const WHATSAPP_SENDER_ID = "MG079062f161fcf64622214b97dfe44e3c";
+  "HX2dd028a6614cbc1e12a5ed3eeee0ab24";
+
+export const WHATSAPP_SENDER_ID = process.env["TWILIO_MESSAGING_SID"];
 export const WHATSAPP_GENERIC_REPLY = `Você está em um canal de mensagens automáticas. Mas saiba que estamos aqui para ajudar!
 
 Se precisar conversar com alguém da nossa equipe, por favor, sinta-se à vontade para nos contatar pelo e-mail: voluntaria@mapadoacolhimento.org`;
+
 export const WHATSAPP_POSITIVE_REPLY = `Obrigada por confirmar sua disponibilidade! 💜 Vamos compartilhar seu contato com a acolhida. Agora é só aguardar o contato dela para que vocês iniciem o atendimento!
 
 📩 *Pedimos que fique atenta ao seu e-mail, pois as próximas atualizações serão enviadas por lá!*`;

@@ -12,6 +12,42 @@ import type { ZendeskUser } from "../types";
 import updateUser from "../zendeskClient/updateUser";
 import sendTemplateMessage from "../twilioClient/sendTemplateMessage";
 
+export async function fetchSupportRequestAndVolunteer(
+  supportRequestId: number,
+  volunteerId: number
+) {
+  const volunteer = await client.volunteers.findUniqueOrThrow({
+    where: {
+      id: volunteerId,
+      phone: {
+        not: "not_found",
+      },
+      zendeskUserId: {
+        not: null,
+      },
+    },
+    select: {
+      id: true,
+      firstName: true,
+      phone: true,
+      zendeskUserId: true,
+    },
+  });
+
+  const supportRequest = await client.supportRequests.findUniqueOrThrow({
+    where: { supportRequestId: supportRequestId },
+    select: {
+      supportRequestId: true,
+      msrId: true,
+      zendeskTicketId: true,
+      city: true,
+      state: true,
+    },
+  });
+
+  return { supportRequest, volunteer };
+}
+
 export async function createMatchConfirmation(
   supportRequest: Pick<SupportRequests, "supportRequestId" | "msrId">,
   volunteerId: number,
@@ -129,8 +165,14 @@ export async function makeVolunteerUnavailable(
 
 export async function sendWhatsAppMessage(
   volunteer: Pick<Volunteers, "id" | "firstName" | "phone">,
-  supportRequest: Pick<SupportRequests, "city" | "state">
+  supportRequest: Pick<SupportRequests, "city" | "state">,
+  matchConfirmationId: number
 ) {
+  const contentVariables = {
+    volunteerName: volunteer.firstName,
+    matchConfirmationId: matchConfirmationId.toString(),
+  };
+
   const msrHasCity =
     supportRequest.city &&
     supportRequest.city !== "not_found" &&
@@ -138,10 +180,6 @@ export async function sendWhatsAppMessage(
     supportRequest.state !== "not_found";
 
   if (!msrHasCity) {
-    const contentVariables = {
-      1: volunteer.firstName,
-    };
-
     const message = await sendTemplateMessage(
       WHATSAPP_TEMPLATE_WITHOUT_CITY_ID,
       volunteer.phone,
@@ -172,15 +210,13 @@ export async function sendWhatsAppMessage(
     supportRequest.state +
     ")";
 
-  const contentVariables = {
-    1: volunteer.firstName,
-    2: cityPrettyName,
-  };
-
   const message = await sendTemplateMessage(
     WHATSAPP_TEMPLATE_WITH_CITY_ID,
     volunteer.phone,
-    contentVariables
+    {
+      ...contentVariables,
+      msrCity: cityPrettyName,
+    }
   );
 
   if (!message || message.status != "accepted")
@@ -201,4 +237,26 @@ export function initCap(cityName: string) {
     .join(" ");
 
   return cityNameInitCap;
+}
+
+export function getMatchConfirmationId(buttonPayload: string) {
+  const matchConfirmationId = Number(buttonPayload.split("_")[1]);
+  return matchConfirmationId;
+}
+
+export async function fetchMatchConfirmation(matchConfirmationId: number) {
+  const matchConfirmation = await client.matchConfirmations.findUniqueOrThrow({
+    where: {
+      matchConfirmationId: matchConfirmationId,
+      status: "waiting",
+    },
+    select: {
+      matchConfirmationId: true,
+      supportRequestId: true,
+      volunteerId: true,
+      matchType: true,
+      matchStage: true,
+    },
+  });
+  return matchConfirmation;
 }
