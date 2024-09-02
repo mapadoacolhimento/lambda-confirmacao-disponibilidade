@@ -26,7 +26,7 @@ export const WHATSAPP_TEMPLATE_WITH_CITY_ID =
 export const WHATSAPP_TEMPLATE_WITHOUT_CITY_ID =
   "HX2dd028a6614cbc1e12a5ed3eeee0ab24";
 
-export const WHATSAPP_SENDER_ID = "***REMOVED***";
+export const WHATSAPP_SENDER_ID = process.env["TWILIO_MESSAGING_SID"];
 export const WHATSAPP_GENERIC_REPLY = `Você está em um canal de mensagens automáticas. Mas saiba que estamos aqui para ajudar!
 
 Se precisar conversar com alguém da nossa equipe, por favor, sinta-se à vontade para nos contatar pelo e-mail: voluntaria@mapadoacolhimento.org`;

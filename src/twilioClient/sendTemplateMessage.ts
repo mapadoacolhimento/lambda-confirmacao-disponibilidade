@@ -10,7 +10,7 @@ export default async function sendTemplateMessage(
   const message = await twilioClient.messages.create({
     contentSid: templateId,
     contentVariables: JSON.stringify(contentVariables),
-    from: WHATSAPP_SENDER_ID,
+    from: WHATSAPP_SENDER_ID!,
     to: "whatsapp:+" + phone,
   });
 
