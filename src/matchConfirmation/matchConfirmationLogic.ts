@@ -252,6 +252,7 @@ export async function fetchMatchConfirmation(matchConfirmationId: number) {
     },
     select: {
       matchConfirmationId: true,
+      msrId: true,
       supportRequestId: true,
       volunteerId: true,
       matchType: true,
