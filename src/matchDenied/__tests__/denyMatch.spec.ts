@@ -117,8 +117,8 @@ describe("denyMatch", () => {
 
       expect(sendEmailToMsrMock).toHaveBeenNthCalledWith(
         1,
-        msrPIIMock.email,
-        msrPIIMock.firstName
+        msrPIIMock,
+        supportRequestMock
       );
     });
   });

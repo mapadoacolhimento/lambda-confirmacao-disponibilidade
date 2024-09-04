@@ -18,7 +18,10 @@ export default async function denyMatch(
     MatchConfirmations,
     "matchConfirmationId" | "supportRequestId" | "volunteerId" | "msrId"
   >,
-  supportRequest: Pick<SupportRequests, "zendeskTicketId">,
+  supportRequest: Pick<
+    SupportRequests,
+    "supportRequestId" | "supportType" | "zendeskTicketId"
+  >,
   volunteer: Pick<Volunteers, "id" | "firstName" | "zendeskUserId">
 ) {
   await updateTicketWithDenial(supportRequest.zendeskTicketId, volunteer);
@@ -35,8 +38,7 @@ export default async function denyMatch(
 
   if (!hasPreviousMatchConfirmations) {
     const msrPii = await fetchMsrPii(matchConfirmation.msrId);
-    const msrFirstName = msrPii.firstName || "Acolhida";
 
-    await sendEmailToMsr(msrPii.email, msrFirstName);
+    await sendEmailToMsr(msrPii, supportRequest);
   }
 }

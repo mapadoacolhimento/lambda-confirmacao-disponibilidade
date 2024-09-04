@@ -40,6 +40,7 @@ export async function fetchSupportRequestAndVolunteer(
       supportRequestId: true,
       msrId: true,
       zendeskTicketId: true,
+      supportType: true,
       city: true,
       state: true,
     },
