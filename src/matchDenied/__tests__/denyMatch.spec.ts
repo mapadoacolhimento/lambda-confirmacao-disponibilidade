@@ -131,7 +131,7 @@ describe("denyMatch", () => {
       expect(fetchMsrPiiMock).toHaveBeenCalledTimes(0);
     });
 
-    it("should call sendEmailToMsr with correct params", async () => {
+    it("should not call sendEmailToMsr with correct params", async () => {
       checkPreviousMatchConfirmationsMock.mockResolvedValueOnce(true);
       await denyMatch(matchConfirmationMock, supportRequestMock, volunteerMock);
 
