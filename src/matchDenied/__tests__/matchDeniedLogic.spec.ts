@@ -71,7 +71,7 @@ describe("makeVolunteerAvailable", () => {
 });
 
 describe("checkPreviousMatchConfirmations", () => {
-  it("should true if support_request has previous match confirmations", async () => {
+  it("should return true if support_request has previous match confirmations", async () => {
     prismaMock.matchConfirmations.findMany.mockResolvedValueOnce([
       matchConfirmationMock,
     ]);
@@ -83,7 +83,7 @@ describe("checkPreviousMatchConfirmations", () => {
     expect(res).toStrictEqual(true);
   });
 
-  it("should false if support_request doesn't have previous match confirmations", async () => {
+  it("should return false if support_request doesn't have previous match confirmations", async () => {
     prismaMock.matchConfirmations.findMany.mockResolvedValueOnce([]);
 
     const res = await checkPreviousMatchConfirmations(
