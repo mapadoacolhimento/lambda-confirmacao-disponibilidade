@@ -29,11 +29,11 @@ export default async function denyMatch(
 
   await makeVolunteerAvailable(volunteer);
 
-  const shouldSendEmailToMsr = await checkPreviousMatchConfirmations(
+  const hasPreviousMatchConfirmations = await checkPreviousMatchConfirmations(
     matchConfirmation.supportRequestId
   );
 
-  if (shouldSendEmailToMsr) {
+  if (!hasPreviousMatchConfirmations) {
     const msrPii = await fetchMsrPii(matchConfirmation.msrId);
     const msrFirstName = msrPii.firstName || "Acolhida";
 

@@ -8,9 +8,11 @@ import {
 export * from "./Zendesk";
 export * from "./Twilio";
 
-export enum ButtonText {
+export enum ReplyType {
   positive = POSITIVE_ANSWER,
   negative = NEGATIVE_ANSWER,
   unregistration = UNREGISTRATION_ANSWER,
   continue = CONTINUE_AVAILABLE_ANSWER,
+  generic = "NO BUTTON TEXT",
+  error = "ERROR",
 }

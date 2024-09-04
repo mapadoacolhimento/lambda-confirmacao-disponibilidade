@@ -1,4 +1,3 @@
-import * as cleanPhone from "../../utils/cleanPhone";
 import sendReply from "../sendReply";
 import {
   replyMock,
@@ -7,11 +6,9 @@ import {
   volunteerPhoneMock,
 } from "../__mocks__";
 import * as replyLogic from "../replyLogic";
-import { ButtonText } from "../../types";
+import { ReplyType } from "../../types";
 
-const volunteerFrom = "whatsapp%3A%2B5511123456789";
-
-const cleanPhoneMock = jest.spyOn(cleanPhone, "default");
+const phone = "5511123456789";
 
 const sendPositiveReplyMock = jest.spyOn(replyLogic, "sendPositiveReply");
 
@@ -35,14 +32,8 @@ describe("sendReply", () => {
     sendTemplateMessageMock.mockResolvedValue(replyMock);
   });
 
-  it("should call cleanPhone with correct params", async () => {
-    await sendReply(volunteerFrom, ButtonText.positive);
-
-    expect(cleanPhoneMock).toHaveBeenNthCalledWith(1, volunteerFrom);
-  });
-
   it("should call sendPositiveReply with correct params", async () => {
-    await sendReply(volunteerFrom, ButtonText.positive);
+    await sendReply(phone, ReplyType.positive);
 
     expect(sendPositiveReplyMock).toHaveBeenNthCalledWith(
       1,
@@ -51,7 +42,7 @@ describe("sendReply", () => {
   });
 
   it("should call sendNegativeReply with correct params", async () => {
-    await sendReply(volunteerFrom, ButtonText.negative);
+    await sendReply(phone, ReplyType.negative);
 
     expect(sendNegativeReplyMock).toHaveBeenNthCalledWith(
       1,
@@ -60,7 +51,7 @@ describe("sendReply", () => {
   });
 
   it("should call sendContinueAvailableReply with correct params", async () => {
-    await sendReply(volunteerFrom, ButtonText.continue);
+    await sendReply(phone, ReplyType.continue);
 
     expect(sendContinueAvailableReplyMock).toHaveBeenNthCalledWith(
       1,
@@ -69,7 +60,7 @@ describe("sendReply", () => {
   });
 
   it("should call sendUnregistrationReply with correct params", async () => {
-    await sendReply(volunteerFrom, ButtonText.unregistration);
+    await sendReply(phone, ReplyType.unregistration);
 
     expect(sendUnregistrationReplyMock).toHaveBeenNthCalledWith(
       1,
@@ -78,13 +69,13 @@ describe("sendReply", () => {
   });
 
   it("should call sendGenericReply with correct params", async () => {
-    await sendReply(volunteerFrom, undefined);
+    await sendReply(phone, undefined);
 
     expect(sendGenericReplyMock).toHaveBeenNthCalledWith(1, volunteerPhoneMock);
   });
 
   it("should return the reply that was sent", async () => {
-    const res = await sendReply(volunteerFrom, undefined);
+    const res = await sendReply(phone, undefined);
 
     expect(res).toStrictEqual(replyMock);
   });

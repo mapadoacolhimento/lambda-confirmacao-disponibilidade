@@ -245,7 +245,7 @@ export function getMatchConfirmationId(buttonPayload: string) {
 }
 
 export async function fetchMatchConfirmation(matchConfirmationId: number) {
-  const matchConfirmation = await client.matchConfirmations.findUniqueOrThrow({
+  const matchConfirmation = await client.matchConfirmations.findUnique({
     where: {
       matchConfirmationId: matchConfirmationId,
       status: "waiting",

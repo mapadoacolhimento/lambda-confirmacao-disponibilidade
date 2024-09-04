@@ -41,6 +41,7 @@ export const WHATSAPP_POSITIVE_REPLY = `Obrigada por confirmar sua disponibilida
 export const WHATSAPP_NEGATIVE_REPLY_TEMPLATE_ID =
   "HX0933a196163d79735d6ec3871672ce14";
 export const WHATSAPP_CONTINUE_AVAILABLE_REPLY = `Obrigada pelo seu retorno! Em breve você receberá outras oportunidades de atendimento. 💜`;
+export const WHATSAPP_ERROR_REPLY = `Ops, parece que essa solicitação já foi processada. Se estiver enfrentando alguma dificuldade, por favor, entre em contato pelo e-mail: voluntaria@mapadoacolhimento.org`;
 export const WHATSAPP_UNREGISTRATION_REPLY_TEMPLATE_ID =
   "HX3ccc5212f22ecc0dbb2d27096374fb2c";
 

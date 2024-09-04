@@ -42,9 +42,7 @@ export async function updateTicketWithDenial(
       },
     ],
     comment: {
-      body: `A [Voluntária ${volunteer.firstName}](https://mapadoacolhimento.zendesk.com/agent/users/${volunteer.zendeskUserId}) negou o match.
-            
-            O pedido de acolhimento foi encaminhado para a fila do Match Diário.`,
+      body: `A [Voluntária ${volunteer.firstName}](https://mapadoacolhimento.zendesk.com/agent/users/${volunteer.zendeskUserId}) negou o match.\n\nO pedido de acolhimento foi encaminhado para a fila do Match Diário.`,
       public: false,
     },
   };
@@ -88,7 +86,7 @@ export async function makeVolunteerAvailable(
       `Couldn't update volunteer Zendesk status for zendesk_user_id: ${volunteer.zendeskUserId} `
     );
 
-  await client.volunteers.update({
+  const updatedVolunteer = await client.volunteers.update({
     where: {
       id: volunteer.id,
     },
@@ -115,6 +113,8 @@ export async function makeVolunteerAvailable(
       updated_at: new Date().toISOString(),
     },
   });
+
+  return updatedVolunteer;
 }
 
 export async function checkPreviousMatchConfirmations(
@@ -139,6 +139,10 @@ export async function fetchMsrPii(msrId: bigint) {
   const msrPii = client.mSRPiiSec.findUniqueOrThrow({
     where: {
       msrId: msrId,
+    },
+    select: {
+      email: true,
+      firstName: true,
     },
   });
 
