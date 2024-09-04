@@ -26,6 +26,8 @@ const sendUnregistrationReplyMock = jest.spyOn(
 
 const sendGenericReplyMock = jest.spyOn(replyLogic, "sendGenericReply");
 
+const sendErrorReplyMock = jest.spyOn(replyLogic, "sendErrorReply");
+
 describe("sendReply", () => {
   beforeEach(() => {
     sendOpenReplyMock.mockResolvedValue(replyMock);
@@ -72,6 +74,12 @@ describe("sendReply", () => {
     await sendReply(phone, undefined);
 
     expect(sendGenericReplyMock).toHaveBeenNthCalledWith(1, volunteerPhoneMock);
+  });
+
+  it("should call sendErrorReply with correct params", async () => {
+    await sendReply(phone, ReplyType.error);
+
+    expect(sendErrorReplyMock).toHaveBeenNthCalledWith(1, volunteerPhoneMock);
   });
 
   it("should return the reply that was sent", async () => {
