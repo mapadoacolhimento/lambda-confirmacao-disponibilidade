@@ -1,4 +1,4 @@
-import type { Volunteers } from "@prisma/client";
+import type { MatchConfirmations, Volunteers } from "@prisma/client";
 import type { ZendeskUser } from "../types";
 import updateTicket from "../zendeskClient/updateTicket";
 import client from "../prismaClient";
@@ -118,14 +118,20 @@ export async function makeVolunteerAvailable(
 }
 
 export async function checkPreviousMatchConfirmations(
-  supportRequestId: number
+  matchConfirmation: Pick<
+    MatchConfirmations,
+    "matchConfirmationId" | "supportRequestId"
+  >
 ) {
   const previousMatchConfirmations =
     (await client.matchConfirmations.findMany({
       where: {
-        supportRequestId: supportRequestId,
+        supportRequestId: matchConfirmation.supportRequestId,
         status: {
           in: ["denied", "expired"],
+        },
+        matchConfirmationId: {
+          not: matchConfirmation.matchConfirmationId,
         },
       },
     })) || [];

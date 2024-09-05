@@ -96,7 +96,7 @@ describe("denyMatch", () => {
 
     expect(checkPreviousMatchConfirmationsMock).toHaveBeenNthCalledWith(
       1,
-      matchConfirmationMock.supportRequestId
+      matchConfirmationMock
     );
   });
 

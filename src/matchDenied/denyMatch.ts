@@ -32,9 +32,8 @@ export default async function denyMatch(
 
   await makeVolunteerAvailable(volunteer);
 
-  const hasPreviousMatchConfirmations = await checkPreviousMatchConfirmations(
-    matchConfirmation.supportRequestId
-  );
+  const hasPreviousMatchConfirmations =
+    await checkPreviousMatchConfirmations(matchConfirmation);
 
   if (!hasPreviousMatchConfirmations) {
     const msrPii = await fetchMsrPii(matchConfirmation.msrId);

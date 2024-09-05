@@ -76,9 +76,7 @@ describe("checkPreviousMatchConfirmations", () => {
       matchConfirmationMock,
     ]);
 
-    const res = await checkPreviousMatchConfirmations(
-      supportRequestMock.supportRequestId
-    );
+    const res = await checkPreviousMatchConfirmations(matchConfirmationMock);
 
     expect(res).toStrictEqual(true);
   });
@@ -86,9 +84,7 @@ describe("checkPreviousMatchConfirmations", () => {
   it("should return false if support_request doesn't have previous match confirmations", async () => {
     prismaMock.matchConfirmations.findMany.mockResolvedValueOnce([]);
 
-    const res = await checkPreviousMatchConfirmations(
-      supportRequestMock.supportRequestId
-    );
+    const res = await checkPreviousMatchConfirmations(matchConfirmationMock);
 
     expect(res).toStrictEqual(false);
   });
