@@ -1,68 +1,39 @@
-import {
-  authenticateMatchMock,
-  createMatchMock,
-  matchMock,
-} from "../../matchAccepted/__mocks__";
 import * as acceptMatch from "../../matchAccepted/acceptMatch";
+import * as denyMatch from "../../matchDenied/denyMatch";
 import * as matchConfirmationLogic from "../matchConfirmationLogic";
 import { prismaMock } from "../../setupTests";
-import type { ButtonText } from "../../types";
+import type { ReplyType } from "../../types";
 import {
   matchConfirmationMock,
-  msrZendeskTicketMock,
   supportRequestMock,
-  updateTicketMock,
   volunteerMock,
 } from "../__mocks__";
 import processMatchConfirmation from "../processMatchConfirmation";
 
-const getMatchConfirmationIdMock = jest.spyOn(
-  matchConfirmationLogic,
-  "getMatchConfirmationId"
-);
-const fetchMatchConfirmationMock = jest.spyOn(
-  matchConfirmationLogic,
-  "fetchMatchConfirmation"
-);
 const fetchSupportRequestAndVolunteerMock = jest.spyOn(
   matchConfirmationLogic,
   "fetchSupportRequestAndVolunteer"
 );
-const acceptMatchMock = jest.spyOn(acceptMatch, "default");
-
-const buttonTextMock = "Sim" as ButtonText;
-const buttonPayloadMock = "yes_12345";
+const acceptMatchMock = jest
+  .spyOn(acceptMatch, "default")
+  .mockImplementation(() => Promise.resolve());
+const denyMatchMock = jest
+  .spyOn(denyMatch, "default")
+  .mockImplementation(() => Promise.resolve());
+const buttonTextMock = "Sim" as ReplyType.positive;
 
 describe("processMatchConfirmation", () => {
   beforeEach(() => {
-    prismaMock.matchConfirmations.findUniqueOrThrow.mockResolvedValue(
-      matchConfirmationMock
-    );
     prismaMock.supportRequests.findUniqueOrThrow.mockResolvedValue(
       supportRequestMock
     );
     prismaMock.volunteers.findUniqueOrThrow.mockResolvedValue(volunteerMock);
-    updateTicketMock.mockResolvedValueOnce(msrZendeskTicketMock);
-    authenticateMatchMock.mockResolvedValueOnce("abc");
-    createMatchMock.mockResolvedValueOnce(matchMock);
-  });
-  it("should call getMatchConfirmationId with correct params", async () => {
-    await processMatchConfirmation(buttonTextMock, buttonPayloadMock);
-
-    expect(getMatchConfirmationIdMock).toHaveBeenNthCalledWith(
-      1,
-      buttonPayloadMock
-    );
-  });
-
-  it("should call fetchMatchConfirmation with correct params", async () => {
-    await processMatchConfirmation(buttonTextMock, buttonPayloadMock);
-
-    expect(fetchMatchConfirmationMock).toHaveBeenNthCalledWith(1, 12345);
+    acceptMatchMock.mockResolvedValue();
+    denyMatchMock.mockResolvedValue();
   });
 
   it("should call fetchSupportRequestAndVolunteer with correct params", async () => {
-    await processMatchConfirmation(buttonTextMock, buttonPayloadMock);
+    await processMatchConfirmation(matchConfirmationMock, buttonTextMock);
 
     expect(fetchSupportRequestAndVolunteerMock).toHaveBeenNthCalledWith(
       1,
@@ -73,7 +44,10 @@ describe("processMatchConfirmation", () => {
 
   describe("accept match when volunteer answered positively", () => {
     it("should call acceptMatch with correct params", async () => {
-      await processMatchConfirmation(buttonTextMock, buttonPayloadMock);
+      await processMatchConfirmation(
+        matchConfirmationMock,
+        "Sim" as ReplyType.positive
+      );
 
       expect(acceptMatchMock).toHaveBeenNthCalledWith(
         1,
@@ -81,6 +55,40 @@ describe("processMatchConfirmation", () => {
         supportRequestMock,
         volunteerMock
       );
+    });
+
+    it("should return the match_confirmation", async () => {
+      const res = await processMatchConfirmation(
+        matchConfirmationMock,
+        "Sim" as ReplyType.positive
+      );
+
+      expect(res).toStrictEqual(matchConfirmationMock);
+    });
+  });
+
+  describe("deny match when volunteer answered negatively", () => {
+    it("should call denyMatch with correct params", async () => {
+      await processMatchConfirmation(
+        matchConfirmationMock,
+        "Não" as ReplyType.negative
+      );
+
+      expect(denyMatchMock).toHaveBeenNthCalledWith(
+        1,
+        matchConfirmationMock,
+        supportRequestMock,
+        volunteerMock
+      );
+    });
+
+    it("should return the match_confirmation", async () => {
+      const res = await processMatchConfirmation(
+        matchConfirmationMock,
+        "Não" as ReplyType.negative
+      );
+
+      expect(res).toStrictEqual(matchConfirmationMock);
     });
   });
 });

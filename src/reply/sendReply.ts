@@ -1,7 +1,7 @@
-import { ButtonText, type TwilioMessage } from "../types";
-import { cleanPhone } from "../utils";
+import { ReplyType, type TwilioMessage } from "../types";
 import {
   sendContinueAvailableReply,
+  sendErrorReply,
   sendGenericReply,
   sendNegativeReply,
   sendPositiveReply,
@@ -10,25 +10,20 @@ import {
 
 export default async function sendReply(
   phone: string,
-  buttonText?: ButtonText
+  buttonText: ReplyType = ReplyType.generic
 ): Promise<TwilioMessage> {
-  const cleanedPhone = cleanPhone(phone);
-
-  if (!buttonText) {
-    const reply = await sendGenericReply(cleanedPhone);
-    return reply;
-  }
-
-  const ANSWER_TYPES = {
-    [ButtonText.positive]: sendPositiveReply,
-    [ButtonText.negative]: sendNegativeReply,
-    [ButtonText.continue]: sendContinueAvailableReply,
-    [ButtonText.unregistration]: sendUnregistrationReply,
+  const REPLY_FUNCTIONS = {
+    [ReplyType.positive]: sendPositiveReply,
+    [ReplyType.negative]: sendNegativeReply,
+    [ReplyType.continue]: sendContinueAvailableReply,
+    [ReplyType.unregistration]: sendUnregistrationReply,
+    [ReplyType.generic]: sendGenericReply,
+    [ReplyType.error]: sendErrorReply,
   };
 
-  const sendReply = ANSWER_TYPES[buttonText] || sendGenericReply;
+  const replyFunction = REPLY_FUNCTIONS[buttonText];
 
-  const reply = await sendReply(cleanedPhone);
+  const reply = await replyFunction(phone);
 
   return reply;
 }

@@ -13,8 +13,11 @@ export const ZENDESK_CUSTOM_FIELDS_DICIO = {
 
 export const ZENDESK_TICKET_WAITING_FOR_CONFIRMATION_STATUS =
   "encaminhamento__aguardando_confirmação";
+export const ZENDESK_TICKET_WAITING_FOR_MATCH_STATUS =
+  "aguardando_match__sem_prioridade";
 export const ZENDESK_USER_WAITING_FOR_CONFIRMATION_STATUS =
   "indisponivel_aguardando_confirmacao";
+export const ZENDESK_USER_AVAILABLE_STATUS = "disponivel";
 
 // TWILIO
 export const TWILIO_ACCOUNT_SID = process.env["TWILIO_ACCOUNT_SID"];
@@ -38,6 +41,7 @@ export const WHATSAPP_POSITIVE_REPLY = `Obrigada por confirmar sua disponibilida
 export const WHATSAPP_NEGATIVE_REPLY_TEMPLATE_ID =
   "HX0933a196163d79735d6ec3871672ce14";
 export const WHATSAPP_CONTINUE_AVAILABLE_REPLY = `Obrigada pelo seu retorno! Em breve você receberá outras oportunidades de atendimento. 💜`;
+export const WHATSAPP_ERROR_REPLY = `Ops, parece que essa solicitação já foi processada. Se estiver enfrentando alguma dificuldade, por favor, entre em contato pelo e-mail: voluntaria@mapadoacolhimento.org`;
 export const WHATSAPP_UNREGISTRATION_REPLY_TEMPLATE_ID =
   "HX3ccc5212f22ecc0dbb2d27096374fb2c";
 
@@ -46,3 +50,6 @@ export const POSITIVE_ANSWER = "Sim";
 export const NEGATIVE_ANSWER = "Não";
 export const CONTINUE_AVAILABLE_ANSWER = "É+um+caso+pontual";
 export const UNREGISTRATION_ANSWER = "Quero+descadastrar";
+
+// LOOPS
+export const MSR_EMAIL_TRANSACTION_ID = "clzspeh8m00jw10mfp8yl96ih";

@@ -1,5 +1,6 @@
 import {
   WHATSAPP_CONTINUE_AVAILABLE_REPLY,
+  WHATSAPP_ERROR_REPLY,
   WHATSAPP_GENERIC_REPLY,
   WHATSAPP_NEGATIVE_REPLY_TEMPLATE_ID,
   WHATSAPP_POSITIVE_REPLY,
@@ -13,6 +14,7 @@ import {
 } from "../__mocks__/utils";
 import {
   sendContinueAvailableReply,
+  sendErrorReply,
   sendGenericReply,
   sendNegativeReply,
   sendPositiveReply,
@@ -154,6 +156,32 @@ describe("replyLogic", () => {
 
     it("should return the reply that was sent", async () => {
       const res = await sendUnregistrationReply(volunteerPhoneMock);
+
+      expect(res).toStrictEqual(replyMock);
+    });
+  });
+
+  describe("sendErrorReply", () => {
+    it("should call sendOpenReply with correct params", async () => {
+      await sendErrorReply(volunteerPhoneMock);
+
+      expect(sendOpenReplyMock).toHaveBeenNthCalledWith(
+        1,
+        WHATSAPP_ERROR_REPLY,
+        volunteerPhoneMock
+      );
+    });
+
+    it("should throw an error if message wasn't sent", async () => {
+      sendOpenReplyMock.mockResolvedValueOnce(null);
+
+      await expect(sendErrorReply(volunteerPhoneMock)).rejects.toThrow(
+        `Couldn't send whatsapp message to phone: ${volunteerPhoneMock}`
+      );
+    });
+
+    it("should return the reply that was sent", async () => {
+      const res = await sendErrorReply(volunteerPhoneMock);
 
       expect(res).toStrictEqual(replyMock);
     });

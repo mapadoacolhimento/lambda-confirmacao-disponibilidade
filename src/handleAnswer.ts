@@ -5,14 +5,13 @@ import type {
 } from "aws-lambda";
 import { object, string } from "yup";
 import { getErrorMessage, stringfyBigInt, parseParamsToJson } from "./utils";
-import sendReply from "./reply/sendReply";
-import { ButtonText } from "./types";
-import processMatchConfirmation from "./matchConfirmation/processMatchConfirmation";
+import handleVolunteerAnswer from "./handleVolunteerAnswer/handleVolunteerAnswer";
+import { ReplyType } from "./types";
 
 const bodySchema = object({
   MessageSid: string().required(),
   From: string().required(),
-  ButtonText: string().oneOf(Object.values(ButtonText)),
+  ButtonText: string().oneOf(Object.values(ReplyType)),
   ButtonPayload: string(),
 }).required();
 
@@ -36,10 +35,7 @@ export default async function handler(
       ButtonPayload: buttonPayload,
     } = validatedBody;
 
-    const reply = await sendReply(from, buttonText);
-
-    if (buttonText && buttonPayload)
-      await processMatchConfirmation(buttonText, buttonPayload);
+    const reply = await handleVolunteerAnswer(from, buttonText, buttonPayload);
 
     const bodyRes = JSON.stringify({
       message: stringfyBigInt(reply),

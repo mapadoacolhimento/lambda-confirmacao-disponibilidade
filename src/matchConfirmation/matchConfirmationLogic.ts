@@ -40,6 +40,7 @@ export async function fetchSupportRequestAndVolunteer(
       supportRequestId: true,
       msrId: true,
       zendeskTicketId: true,
+      supportType: true,
       city: true,
       state: true,
     },
@@ -245,13 +246,14 @@ export function getMatchConfirmationId(buttonPayload: string) {
 }
 
 export async function fetchMatchConfirmation(matchConfirmationId: number) {
-  const matchConfirmation = await client.matchConfirmations.findUniqueOrThrow({
+  const matchConfirmation = await client.matchConfirmations.findUnique({
     where: {
       matchConfirmationId: matchConfirmationId,
       status: "waiting",
     },
     select: {
       matchConfirmationId: true,
+      msrId: true,
       supportRequestId: true,
       volunteerId: true,
       matchType: true,

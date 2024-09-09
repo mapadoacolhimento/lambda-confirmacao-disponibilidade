@@ -19,6 +19,7 @@ export const supportRequestMock = {
   supportRequestId: 1,
   msrId: 12345 as unknown as bigint,
   zendeskTicketId: 1 as unknown as bigint,
+  supportType: "legal",
   status: "waiting_for_confirmation" as SupportRequestsStatus,
 } as SupportRequests;
 
