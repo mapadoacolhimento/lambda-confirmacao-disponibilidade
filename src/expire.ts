@@ -52,7 +52,7 @@ export default async function handler(
     if (error["name"] === "ValidationError") {
       const errorMsg = `Validation error: ${getErrorMessage(error)}`;
 
-      console.error(`[create-match-confirmation] - [400]: ${errorMsg}`);
+      console.error(`[expire] - [400]: ${errorMsg}`);
 
       return callback(null, {
         statusCode: 400,
@@ -63,7 +63,7 @@ export default async function handler(
     }
 
     const errorMsg = getErrorMessage(error);
-    console.error(`[create-match-confirmation] - [500]: ${errorMsg}`);
+    console.error(`[expire] - [500]: ${errorMsg}`);
 
     return callback(null, {
       statusCode: 500,
