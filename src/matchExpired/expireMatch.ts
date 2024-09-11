@@ -17,8 +17,6 @@ import {
 export default async function expireMatch(matchConfirmationId: number) {
   const matchConfirmation = await fetchMatchConfirmation(matchConfirmationId);
 
-  console.log({ matchConfirmation });
-
   if (!matchConfirmation) return null;
 
   const { supportRequest, volunteer } = await fetchSupportRequestAndVolunteer(
