@@ -8,7 +8,7 @@ export default async function sendOpenReply(
 ): Promise<TwilioMessage | null> {
   const message = await twilioClient.messages.create({
     from: WHATSAPP_SENDER_ID!,
-    to: "whatsapp:+" + phone,
+    to: "whatsapp:+55" + phone,
     body: body,
   });
 
