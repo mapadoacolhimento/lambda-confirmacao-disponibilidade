@@ -7,10 +7,6 @@ export type ZendeskUser = {
   };
 };
 
-export type ZendeskUserRes = {
-  user: ZendeskUser;
-};
-
 export type UpdateZendeskUser = Partial<Omit<ZendeskUser, "id">> & {
   id: bigint;
 };
@@ -25,7 +21,3 @@ export type UpdateZendeskTicket = Partial<Omit<ZendeskTicket, "id">> & {
 };
 
 export type CreateZendeskTicket = Omit<ZendeskTicket, "id">;
-
-export type ZendeskTicketRes = {
-  ticket: ZendeskTicket;
-};

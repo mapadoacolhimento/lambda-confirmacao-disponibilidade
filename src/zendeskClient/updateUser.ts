@@ -6,7 +6,7 @@ import {
   ZENDESK_API_URL,
   ZENDESK_API_USER,
 } from "../constants";
-import type { UpdateZendeskUser, ZendeskUser, ZendeskUserRes } from "../types";
+import type { UpdateZendeskUser, ZendeskUser } from "../types";
 
 export default async function updateUser(
   user: UpdateZendeskUser
@@ -29,13 +29,13 @@ export default async function updateUser(
       },
     });
 
-    if (!response.ok) {
-      throw new Error(response.statusText);
+    const data = (await response.json()) as Record<string, unknown>;
+
+    if (data["error"] && response.status !== 200) {
+      throw new Error(getErrorMessage(data));
     }
 
-    const data = (await response.json()) as ZendeskUserRes;
-
-    return data.user;
+    return data["user"] as ZendeskUser;
   } catch (e) {
     console.error(
       `[updateUser] - Something went wrong when updating this user on Zendesk '${
