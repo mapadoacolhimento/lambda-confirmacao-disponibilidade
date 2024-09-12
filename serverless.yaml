@@ -97,6 +97,9 @@ functions:
       - httpApi:
           path: /expire
           method: POST
+          authorizer:
+            name: auth
+            type: request
 
 plugins:
   - serverless-webpack
