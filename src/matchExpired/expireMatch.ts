@@ -9,6 +9,7 @@ import {
   fetchMsrPii,
   makeVolunteerAvailable,
 } from "../matchDenied/matchDeniedLogic";
+import { sendExpirationReply } from "../reply/replyLogic";
 import {
   expireMatchConfirmation,
   updateTicketWithExpiration,
@@ -31,6 +32,8 @@ export default async function expireMatch(matchConfirmationId: number) {
   await addSupportRequestToQueue(matchConfirmation.supportRequestId);
 
   await makeVolunteerAvailable(volunteer);
+
+  await sendExpirationReply(volunteer.phone);
 
   const hasPreviousMatchConfirmations =
     await checkPreviousMatchConfirmations(matchConfirmation);

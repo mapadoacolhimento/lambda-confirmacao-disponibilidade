@@ -8,7 +8,7 @@ import {
 import * as replyLogic from "../replyLogic";
 import { ReplyType } from "../../types";
 
-const phone = "5511123456789";
+const phone = "11123456789";
 
 const sendPositiveReplyMock = jest.spyOn(replyLogic, "sendPositiveReply");
 

@@ -1,6 +1,7 @@
 import {
   WHATSAPP_CONTINUE_AVAILABLE_REPLY,
   WHATSAPP_ERROR_REPLY,
+  WHATSAPP_EXPIRATION_REPLY,
   WHATSAPP_GENERIC_REPLY,
   WHATSAPP_NEGATIVE_REPLY_TEMPLATE_ID,
   WHATSAPP_POSITIVE_REPLY,
@@ -56,6 +57,13 @@ export async function sendUnregistrationReply(phone: string) {
 
 export async function sendErrorReply(phone: string) {
   const message = await sendOpenReply(WHATSAPP_ERROR_REPLY, phone);
+  if (!message || message.status !== "accepted")
+    throw new Error(`Couldn't send whatsapp message to phone: ${phone}`);
+  return message;
+}
+
+export async function sendExpirationReply(phone: string) {
+  const message = await sendOpenReply(WHATSAPP_EXPIRATION_REPLY, phone);
   if (!message || message.status !== "accepted")
     throw new Error(`Couldn't send whatsapp message to phone: ${phone}`);
   return message;

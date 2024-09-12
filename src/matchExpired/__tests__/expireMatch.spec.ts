@@ -11,9 +11,11 @@ import {
 import * as matchConfirmationLogic from "../../matchConfirmation/matchConfirmationLogic";
 import * as matchExpiredLogic from "../matchExpiredLogic";
 import * as matchDeniedLogic from "../../matchDenied/matchDeniedLogic";
+import * as replyLogic from "../../reply/replyLogic";
 import * as emailClient from "../../emailClient/index";
 import { prismaMock } from "../../setupTests";
 import type { MSRPiiSec } from "@prisma/client";
+import { replyMock, sendOpenReplyMock } from "../../reply/__mocks__";
 
 const fetchMatchConfirmationMock = jest.spyOn(
   matchConfirmationLogic,
@@ -45,6 +47,8 @@ const makeVolunteerAvailableMock = jest.spyOn(
   "makeVolunteerAvailable"
 );
 
+const sendExpirationReplyMock = jest.spyOn(replyLogic, "sendExpirationReply");
+
 const checkPreviousMatchConfirmationsMock = jest.spyOn(
   matchDeniedLogic,
   "checkPreviousMatchConfirmations"
@@ -75,6 +79,7 @@ describe("expireMatch", () => {
     prismaMock.volunteers.findUniqueOrThrow.mockResolvedValueOnce(
       volunteerMock
     );
+    sendOpenReplyMock.mockResolvedValue(replyMock);
   });
 
   it("should call fetchMatchConfirmation with correct params", async () => {
@@ -137,6 +142,15 @@ describe("expireMatch", () => {
     expect(makeVolunteerAvailableMock).toHaveBeenNthCalledWith(
       1,
       volunteerMock
+    );
+  });
+
+  it("should call sendExpirationReplyMock with correct params", async () => {
+    await expireMatch(matchConfirmationMock.matchConfirmationId);
+
+    expect(sendExpirationReplyMock).toHaveBeenNthCalledWith(
+      1,
+      volunteerMock.phone
     );
   });
 

@@ -12,6 +12,7 @@ import {
   volunteerMock,
 } from "../matchConfirmation/__mocks__";
 import type { MSRPiiSec } from "@prisma/client";
+import { replyMock, sendOpenReplyMock } from "../reply/__mocks__";
 
 const callback = jest.fn();
 
@@ -106,6 +107,7 @@ describe("/expire endpoint", () => {
     prismaMock.volunteers.findUniqueOrThrow.mockResolvedValueOnce(
       volunteerMock
     );
+    sendOpenReplyMock.mockResolvedValue(replyMock);
 
     await expire(
       {

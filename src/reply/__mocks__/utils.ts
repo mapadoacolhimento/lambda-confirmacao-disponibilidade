@@ -14,4 +14,4 @@ export const replyMock = {
   status: "accepted",
 } as TwilioMessage;
 
-export const volunteerPhoneMock = "5511123456789";
+export const volunteerPhoneMock = "11123456789";
