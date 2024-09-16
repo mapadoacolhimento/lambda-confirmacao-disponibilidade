@@ -1,6 +1,7 @@
 import {
   WHATSAPP_CONTINUE_AVAILABLE_REPLY,
   WHATSAPP_ERROR_REPLY,
+  WHATSAPP_EXPIRATION_REPLY,
   WHATSAPP_GENERIC_REPLY,
   WHATSAPP_NEGATIVE_REPLY_TEMPLATE_ID,
   WHATSAPP_POSITIVE_REPLY,
@@ -15,6 +16,7 @@ import {
 import {
   sendContinueAvailableReply,
   sendErrorReply,
+  sendExpirationReply,
   sendGenericReply,
   sendNegativeReply,
   sendPositiveReply,
@@ -182,6 +184,32 @@ describe("replyLogic", () => {
 
     it("should return the reply that was sent", async () => {
       const res = await sendErrorReply(volunteerPhoneMock);
+
+      expect(res).toStrictEqual(replyMock);
+    });
+  });
+
+  describe("sendExpirationReply", () => {
+    it("should call sendOpenReply with correct params", async () => {
+      await sendExpirationReply(volunteerPhoneMock);
+
+      expect(sendOpenReplyMock).toHaveBeenNthCalledWith(
+        1,
+        WHATSAPP_EXPIRATION_REPLY,
+        volunteerPhoneMock
+      );
+    });
+
+    it("should throw an error if message wasn't sent", async () => {
+      sendOpenReplyMock.mockResolvedValueOnce(null);
+
+      await expect(sendExpirationReply(volunteerPhoneMock)).rejects.toThrow(
+        `Couldn't send whatsapp message to phone: ${volunteerPhoneMock}`
+      );
+    });
+
+    it("should return the reply that was sent", async () => {
+      const res = await sendExpirationReply(volunteerPhoneMock);
 
       expect(res).toStrictEqual(replyMock);
     });

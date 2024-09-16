@@ -11,7 +11,7 @@ export default async function sendTemplateMessage(
     contentSid: templateId,
     contentVariables: JSON.stringify(contentVariables),
     from: WHATSAPP_SENDER_ID!,
-    to: "whatsapp:+" + phone,
+    to: "whatsapp:+55" + phone,
   });
 
   return message;

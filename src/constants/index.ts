@@ -44,6 +44,7 @@ export const WHATSAPP_CONTINUE_AVAILABLE_REPLY = `Obrigada pelo seu retorno! Em 
 export const WHATSAPP_ERROR_REPLY = `Ops, parece que essa solicitação já foi processada. Se estiver enfrentando alguma dificuldade, por favor, entre em contato pelo e-mail: voluntaria@mapadoacolhimento.org`;
 export const WHATSAPP_UNREGISTRATION_REPLY_TEMPLATE_ID =
   "HX3ccc5212f22ecc0dbb2d27096374fb2c";
+export const WHATSAPP_EXPIRATION_REPLY = `Como não recebemos o seu retorno a tempo, encaminhamos o pedido de ajuda para outra voluntária. De toda forma, obrigada pela sua dedicação a essa rede potente de acolhimento e solidariedade. Em breve você terá outras oportunidades de atendimento. 💜`;
 
 // VOLUNTEER ANSWERS
 export const POSITIVE_ANSWER = "Sim";

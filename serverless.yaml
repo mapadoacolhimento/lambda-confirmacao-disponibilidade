@@ -89,6 +89,17 @@ functions:
       - httpApi:
           path: /handle-answer
           method: POST
+  
+  expire:
+    handler: handler.expire
+    timeout: 30
+    events:
+      - httpApi:
+          path: /expire
+          method: POST
+          authorizer:
+            name: auth
+            type: request
 
 plugins:
   - serverless-webpack

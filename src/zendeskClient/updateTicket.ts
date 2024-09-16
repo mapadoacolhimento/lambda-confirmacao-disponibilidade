@@ -6,11 +6,7 @@ import {
   ZENDESK_API_URL,
   ZENDESK_API_USER,
 } from "../constants";
-import type {
-  UpdateZendeskTicket,
-  ZendeskTicket,
-  ZendeskTicketRes,
-} from "../types";
+import type { UpdateZendeskTicket, ZendeskTicket } from "../types";
 
 export default async function updateTicket(
   ticket: UpdateZendeskTicket
@@ -34,13 +30,13 @@ export default async function updateTicket(
       },
     });
 
-    if (!response.ok) {
-      throw new Error(response.statusText);
+    const data = (await response.json()) as Record<string, unknown>;
+
+    if (data["error"] && response.status !== 200) {
+      throw new Error(getErrorMessage(data));
     }
 
-    const data = (await response.json()) as ZendeskTicketRes;
-
-    return data.ticket;
+    return data["ticket"] as ZendeskTicket;
   } catch (e) {
     console.error(
       `[updateTicket] - Something went wrong when updating this ticket '${

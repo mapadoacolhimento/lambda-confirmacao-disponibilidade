@@ -63,7 +63,7 @@ describe("handleVolunteerAnswer", () => {
 
       expect(sendReplyMock).toHaveBeenNthCalledWith(
         1,
-        "5511123456789",
+        "11123456789",
         ReplyType.unregistration
       );
     });
@@ -103,7 +103,7 @@ describe("handleVolunteerAnswer", () => {
 
       expect(sendReplyMock).toHaveBeenNthCalledWith(
         1,
-        "5511123456789",
+        "11123456789",
         ReplyType.error
       );
     });
@@ -117,7 +117,7 @@ describe("handleVolunteerAnswer", () => {
 
       expect(sendReplyMock).toHaveBeenNthCalledWith(
         1,
-        "5511123456789",
+        "11123456789",
         ReplyType.positive
       );
     });
