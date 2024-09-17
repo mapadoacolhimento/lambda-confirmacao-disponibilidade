@@ -1,4 +1,4 @@
-import { ReplyType, type TwilioMessage } from "../types";
+import { ReplyType } from "../types";
 import {
   sendContinueAvailableReply,
   sendErrorReply,
@@ -11,7 +11,7 @@ import {
 export default async function sendReply(
   phone: string,
   buttonText: ReplyType = ReplyType.generic
-): Promise<TwilioMessage> {
+) {
   const REPLY_FUNCTIONS = {
     [ReplyType.positive]: sendPositiveReply,
     [ReplyType.negative]: sendNegativeReply,

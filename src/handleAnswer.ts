@@ -4,7 +4,7 @@ import type {
   APIGatewayProxyCallback,
 } from "aws-lambda";
 import { object, string } from "yup";
-import { getErrorMessage, stringfyBigInt, parseParamsToJson } from "./utils";
+import { getErrorMessage, parseParamsToJson } from "./utils";
 import handleVolunteerAnswer from "./handleVolunteerAnswer/handleVolunteerAnswer";
 import { ReplyType } from "./types";
 
@@ -37,13 +37,9 @@ export default async function handler(
 
     const reply = await handleVolunteerAnswer(from, buttonText, buttonPayload);
 
-    const bodyRes = JSON.stringify({
-      message: stringfyBigInt(reply),
-    });
-
     return callback(null, {
       statusCode: 200,
-      body: bodyRes,
+      body: reply,
     });
   } catch (e) {
     const error = e as Record<string, unknown>;

@@ -187,7 +187,7 @@ export async function sendWhatsAppMessage(
       contentVariables
     );
 
-    if (!message || message.status != "accepted")
+    if (message != "accepted")
       throw new Error(
         `Couldn't send whatsapp message to volunteer for volunteer_id: ${volunteer.id}`
       );
@@ -220,7 +220,7 @@ export async function sendWhatsAppMessage(
     }
   );
 
-  if (!message || message.status != "accepted")
+  if (message != "accepted")
     throw new Error(
       `Couldn't send whatsapp message to volunteer for volunteer_id: ${volunteer.id}`
     );
