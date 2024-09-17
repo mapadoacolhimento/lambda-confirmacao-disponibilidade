@@ -6,8 +6,12 @@ import { replyMock } from "../reply/__mocks__";
 
 const callback = jest.fn();
 
-const defaultBody =
-  "MessageType=text&Body=Oi&MessageSid=SM802c0d39a503aae472cee7379abff9f6&From=whatsapp%3A%2B5511123456789";
+const defaultBody = {
+  MessageType: "text",
+  Body: "Oi",
+  MessageSid: "SM802c0d39a503aae472cee7379abff9f6",
+  From: "whatsapp%3A%2B5511123456789",
+};
 
 const sendReplyMock = jest.spyOn(sendReply, "default");
 const handleVolunteerAnswerMock = jest.spyOn(handleVolunteerAnswer, "default");
@@ -24,7 +28,7 @@ describe("/handle-answer endpoint", () => {
     expect(callback).toHaveBeenCalledWith(null, {
       statusCode: 400,
       body: JSON.stringify({
-        error: "Validation error: From is a required field",
+        error: "Empty request body",
       }),
     });
   });
@@ -50,7 +54,7 @@ describe("/handle-answer endpoint", () => {
   it("should call handleVolunteerAnswer with correct params", async () => {
     await handleAnswer(
       {
-        body: defaultBody,
+        body: JSON.stringify(defaultBody),
       } as APIGatewayProxyEvent,
       {} as Context,
       callback
@@ -71,7 +75,7 @@ describe("/handle-answer endpoint", () => {
 
     await handleAnswer(
       {
-        body: defaultBody,
+        body: JSON.stringify(defaultBody),
       } as APIGatewayProxyEvent,
       {} as Context,
       callback
@@ -90,7 +94,7 @@ describe("/handle-answer endpoint", () => {
 
     await handleAnswer(
       {
-        body: defaultBody,
+        body: JSON.stringify(defaultBody),
       } as APIGatewayProxyEvent,
       {} as Context,
       callback

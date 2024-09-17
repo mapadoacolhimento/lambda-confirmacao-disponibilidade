@@ -4,7 +4,7 @@ import type {
   APIGatewayProxyCallback,
 } from "aws-lambda";
 import { object, string } from "yup";
-import { getErrorMessage, parseParamsToJson } from "./utils";
+import { getErrorMessage, isJsonString } from "./utils";
 import handleVolunteerAnswer from "./handleVolunteerAnswer/handleVolunteerAnswer";
 import { ReplyType } from "./types";
 
@@ -23,9 +23,21 @@ export default async function handler(
   try {
     const body = event.body;
 
-    const parsedBody =
-      (parseParamsToJson(body) as unknown) ||
-      (Object.create(null) as Record<string, unknown>);
+    if (!body) {
+      const errorMessage = "Empty request body";
+      console.error(`[handle-answer] - [400]: ${errorMessage}`);
+
+      return callback(null, {
+        statusCode: 400,
+        body: JSON.stringify({
+          error: errorMessage,
+        }),
+      });
+    }
+
+    const parsedBody = isJsonString(body)
+      ? (JSON.parse(body) as unknown)
+      : (Object.create(null) as Record<string, unknown>);
 
     const validatedBody = await bodySchema.validate(parsedBody);
 
