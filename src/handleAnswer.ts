@@ -21,11 +21,17 @@ export default async function handler(
   callback: APIGatewayProxyCallback
 ) {
   try {
+    console.log("Received event", JSON.stringify(event, null, 2));
+
     const body = event.body;
+
+    console.log({ body });
 
     const parsedBody =
       (parseParamsToJson(body) as unknown) ||
       (Object.create(null) as Record<string, unknown>);
+
+    console.log({ parsedBody });
 
     const validatedBody = await bodySchema.validate(parsedBody);
 
