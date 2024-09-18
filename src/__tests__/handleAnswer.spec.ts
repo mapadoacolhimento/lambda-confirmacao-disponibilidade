@@ -98,7 +98,7 @@ describe("/handle-answer endpoint", () => {
 
     expect(callback).toHaveBeenCalledWith(null, {
       statusCode: 200,
-      body: replyMock,
+      body: "",
     });
   });
 });

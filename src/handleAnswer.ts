@@ -53,11 +53,11 @@ export default async function handler(
       ButtonPayload: buttonPayload,
     } = validatedBody;
 
-    const reply = await handleVolunteerAnswer(from, buttonText, buttonPayload);
+    await handleVolunteerAnswer(from, buttonText, buttonPayload);
 
     return callback(null, {
       statusCode: 200,
-      body: reply,
+      body: "",
     });
   } catch (e) {
     const error = e as Record<string, unknown>;
