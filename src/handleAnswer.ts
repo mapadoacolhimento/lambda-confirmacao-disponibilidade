@@ -21,17 +21,29 @@ export default async function handler(
   callback: APIGatewayProxyCallback
 ) {
   try {
-    console.log("Received event", JSON.stringify(event, null, 2));
+    let body = event.body;
+    const isBase64Encoded = event.isBase64Encoded;
 
-    const body = event.body;
+    if (!body) {
+      const errorMessage = "Empty request body";
+      console.error(`[create-match] - [400]: ${errorMessage}`);
 
-    console.log({ body });
+      return callback(null, {
+        statusCode: 400,
+        body: JSON.stringify({
+          error: errorMessage,
+        }),
+      });
+    }
+
+    if (isBase64Encoded) {
+      const buff = Buffer.from(body, "base64");
+      body = buff.toString("utf8");
+    }
 
     const parsedBody =
       (parseParamsToJson(body) as unknown) ||
       (Object.create(null) as Record<string, unknown>);
-
-    console.log({ parsedBody });
 
     const validatedBody = await bodySchema.validate(parsedBody);
 
