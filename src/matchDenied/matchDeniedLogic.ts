@@ -1,4 +1,4 @@
-import type { MatchConfirmations, Volunteers } from "@prisma/client";
+import type { Volunteers } from "@prisma/client";
 import type { ZendeskUser } from "../types";
 import updateTicket from "../zendeskClient/updateTicket";
 import client from "../prismaClient";
@@ -115,42 +115,4 @@ export async function makeVolunteerAvailable(
   });
 
   return updatedVolunteer;
-}
-
-export async function checkPreviousMatchConfirmations(
-  matchConfirmation: Pick<
-    MatchConfirmations,
-    "matchConfirmationId" | "supportRequestId"
-  >
-) {
-  const previousMatchConfirmations =
-    (await client.matchConfirmations.findMany({
-      where: {
-        supportRequestId: matchConfirmation.supportRequestId,
-        status: {
-          in: ["denied", "expired"],
-        },
-        matchConfirmationId: {
-          not: matchConfirmation.matchConfirmationId,
-        },
-      },
-    })) || [];
-
-  if (previousMatchConfirmations.length === 0) return false;
-
-  return true;
-}
-
-export async function fetchMsrPii(msrId: bigint) {
-  const msrPii = client.mSRPiiSec.findUniqueOrThrow({
-    where: {
-      msrId: msrId,
-    },
-    select: {
-      email: true,
-      firstName: true,
-    },
-  });
-
-  return msrPii;
 }

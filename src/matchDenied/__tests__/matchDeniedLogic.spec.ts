@@ -1,5 +1,4 @@
 import {
-  matchConfirmationMock,
   msrZendeskTicketMock,
   supportRequestMock,
   updatedUserMock,
@@ -10,7 +9,6 @@ import {
 } from "../../matchConfirmation/__mocks__";
 import { prismaMock } from "../../setupTests";
 import {
-  checkPreviousMatchConfirmations,
   makeVolunteerAvailable,
   updateTicketWithDenial,
 } from "../matchDeniedLogic";
@@ -67,25 +65,5 @@ describe("makeVolunteerAvailable", () => {
     const res = await makeVolunteerAvailable(volunteerMock);
 
     expect(res).toStrictEqual(volunteerMock);
-  });
-});
-
-describe("checkPreviousMatchConfirmations", () => {
-  it("should return true if support_request has previous match confirmations", async () => {
-    prismaMock.matchConfirmations.findMany.mockResolvedValueOnce([
-      matchConfirmationMock,
-    ]);
-
-    const res = await checkPreviousMatchConfirmations(matchConfirmationMock);
-
-    expect(res).toStrictEqual(true);
-  });
-
-  it("should return false if support_request doesn't have previous match confirmations", async () => {
-    prismaMock.matchConfirmations.findMany.mockResolvedValueOnce([]);
-
-    const res = await checkPreviousMatchConfirmations(matchConfirmationMock);
-
-    expect(res).toStrictEqual(false);
   });
 });
