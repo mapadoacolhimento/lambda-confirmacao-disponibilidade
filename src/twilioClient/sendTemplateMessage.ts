@@ -13,5 +13,5 @@ export default async function sendTemplateMessage(
     to: "whatsapp:+55" + phone,
   });
 
-  return message.status;
+  return message?.status || null;
 }

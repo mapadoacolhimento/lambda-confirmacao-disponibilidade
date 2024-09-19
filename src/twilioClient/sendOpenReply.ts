@@ -11,5 +11,5 @@ export default async function sendOpenReply(
     body: body,
   });
 
-  return message.status;
+  return message?.status || null;
 }
