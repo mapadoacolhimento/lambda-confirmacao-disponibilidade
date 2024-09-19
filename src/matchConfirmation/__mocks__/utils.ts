@@ -10,7 +10,6 @@ import type {
   Volunteers,
 } from "@prisma/client";
 import type { ZendeskTicket, ZendeskUser } from "../../types";
-import type { TwilioMessage } from "../../types/Twilio";
 import * as updateTicket from "../../zendeskClient/updateTicket";
 import * as updateUser from "../../zendeskClient/updateUser";
 import * as sendTemplateMessage from "../../twilioClient/sendTemplateMessage";
@@ -82,6 +81,4 @@ export const sendTemplateMessageMock = jest
   .spyOn(sendTemplateMessage, "default")
   .mockImplementation(() => Promise.resolve(null));
 
-export const sentMessageMock = {
-  status: "accepted",
-} as TwilioMessage;
+export const sentMessageMock = "accepted";

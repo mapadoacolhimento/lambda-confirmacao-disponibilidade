@@ -24,7 +24,7 @@ describe("/handle-answer endpoint", () => {
     expect(callback).toHaveBeenCalledWith(null, {
       statusCode: 400,
       body: JSON.stringify({
-        error: "Validation error: From is a required field",
+        error: "Empty request body",
       }),
     });
   });
@@ -98,7 +98,7 @@ describe("/handle-answer endpoint", () => {
 
     expect(callback).toHaveBeenCalledWith(null, {
       statusCode: 200,
-      body: JSON.stringify({ message: replyMock }),
+      body: "",
     });
   });
 });

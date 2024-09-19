@@ -4,7 +4,7 @@ import type {
   APIGatewayProxyCallback,
 } from "aws-lambda";
 import { object, string } from "yup";
-import { getErrorMessage, stringfyBigInt, parseParamsToJson } from "./utils";
+import { getErrorMessage, parseParamsToJson } from "./utils";
 import handleVolunteerAnswer from "./handleVolunteerAnswer/handleVolunteerAnswer";
 import { ReplyType } from "./types";
 
@@ -21,7 +21,25 @@ export default async function handler(
   callback: APIGatewayProxyCallback
 ) {
   try {
-    const body = event.body;
+    let body = event.body;
+    const isBase64Encoded = event.isBase64Encoded;
+
+    if (!body) {
+      const errorMessage = "Empty request body";
+      console.error(`[create-match] - [400]: ${errorMessage}`);
+
+      return callback(null, {
+        statusCode: 400,
+        body: JSON.stringify({
+          error: errorMessage,
+        }),
+      });
+    }
+
+    if (isBase64Encoded) {
+      const buff = Buffer.from(body, "base64");
+      body = buff.toString("utf8");
+    }
 
     const parsedBody =
       (parseParamsToJson(body) as unknown) ||
@@ -35,15 +53,11 @@ export default async function handler(
       ButtonPayload: buttonPayload,
     } = validatedBody;
 
-    const reply = await handleVolunteerAnswer(from, buttonText, buttonPayload);
-
-    const bodyRes = JSON.stringify({
-      message: stringfyBigInt(reply),
-    });
+    await handleVolunteerAnswer(from, buttonText, buttonPayload);
 
     return callback(null, {
       statusCode: 200,
-      body: bodyRes,
+      body: "",
     });
   } catch (e) {
     const error = e as Record<string, unknown>;
