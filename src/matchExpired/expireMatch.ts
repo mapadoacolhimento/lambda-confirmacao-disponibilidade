@@ -1,12 +1,9 @@
-import { sendEmailToMsr } from "../emailClient";
 import {
   fetchMatchConfirmation,
   fetchSupportRequestAndVolunteer,
 } from "../matchConfirmation/matchConfirmationLogic";
 import {
   addSupportRequestToQueue,
-  checkPreviousMatchConfirmations,
-  fetchMsrPii,
   makeVolunteerAvailable,
 } from "../matchDenied/matchDeniedLogic";
 import { sendExpirationReply } from "../reply/replyLogic";
@@ -34,15 +31,6 @@ export default async function expireMatch(matchConfirmationId: number) {
   await makeVolunteerAvailable(volunteer);
 
   await sendExpirationReply(volunteer.phone);
-
-  const hasPreviousMatchConfirmations =
-    await checkPreviousMatchConfirmations(matchConfirmation);
-
-  if (!hasPreviousMatchConfirmations) {
-    const msrPii = await fetchMsrPii(matchConfirmation.msrId);
-
-    await sendEmailToMsr(msrPii, supportRequest);
-  }
 
   return matchConfirmation;
 }

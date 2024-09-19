@@ -5,13 +5,10 @@ import type {
 } from "@prisma/client";
 import {
   addSupportRequestToQueue,
-  checkPreviousMatchConfirmations,
   denyMatchConfirmation,
-  fetchMsrPii,
   makeVolunteerAvailable,
   updateTicketWithDenial,
 } from "./matchDeniedLogic";
-import { sendEmailToMsr } from "../emailClient";
 
 export default async function denyMatch(
   matchConfirmation: Pick<
@@ -31,13 +28,4 @@ export default async function denyMatch(
   await addSupportRequestToQueue(matchConfirmation.supportRequestId);
 
   await makeVolunteerAvailable(volunteer);
-
-  const hasPreviousMatchConfirmations =
-    await checkPreviousMatchConfirmations(matchConfirmation);
-
-  if (!hasPreviousMatchConfirmations) {
-    const msrPii = await fetchMsrPii(matchConfirmation.msrId);
-
-    await sendEmailToMsr(msrPii, supportRequest);
-  }
 }
