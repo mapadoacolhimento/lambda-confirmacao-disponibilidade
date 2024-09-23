@@ -1,5 +1,6 @@
 import acceptMatch from "../acceptMatch";
 import * as matchAcceptedLogic from "../matchAcceptedLogic";
+import * as matchDeniedLogic from "../../matchDenied/matchDeniedLogic";
 import {
   authenticateMatchMock,
   createMatchMock,
@@ -9,7 +10,9 @@ import {
   matchConfirmationMock,
   msrZendeskTicketMock,
   supportRequestMock,
+  updatedUserMock,
   updateTicketMock,
+  updateUserMock,
   volunteerMock,
 } from "../../matchConfirmation/__mocks__";
 
@@ -22,11 +25,26 @@ const confirmMatchConfirmationMock = jest.spyOn(
   "confirmMatchConfirmation"
 );
 
+const makeVolunteerAvailableMock = jest.spyOn(
+  matchDeniedLogic,
+  "makeVolunteerAvailable"
+);
+
 describe("acceptMatch", () => {
   beforeEach(() => {
     updateTicketMock.mockResolvedValueOnce(msrZendeskTicketMock);
+    updateUserMock.mockResolvedValueOnce(updatedUserMock);
     authenticateMatchMock.mockResolvedValueOnce("abc");
     createMatchMock.mockResolvedValueOnce(matchMock);
+  });
+
+  it("should call makeVolunteerAvailable with correct params", async () => {
+    await acceptMatch(matchConfirmationMock, supportRequestMock, volunteerMock);
+
+    expect(makeVolunteerAvailableMock).toHaveBeenNthCalledWith(
+      1,
+      volunteerMock
+    );
   });
 
   it("should call updateTicketWithConfirmation with correct params", async () => {
