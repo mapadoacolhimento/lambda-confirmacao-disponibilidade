@@ -1,3 +1,3 @@
 export default function cleanPhone(phone: string) {
-  return phone.slice(-11);
+  return phone.replace("whatsapp:+55", "").replace("whatsapp%3A%2B55", "");
 }
