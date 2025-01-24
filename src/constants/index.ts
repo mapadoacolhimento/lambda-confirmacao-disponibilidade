@@ -25,9 +25,9 @@ export const TWILIO_AUTH_TOKEN = process.env["TWILIO_AUTH_TOKEN"];
 
 // WHATSAPP
 export const WHATSAPP_TEMPLATE_WITH_CITY_ID =
-  "HX1b57e816efe969dfea42f3b2aa7fc46c";
+  "HXaa3e4ec511af861148d4ec42d8175c3f";
 export const WHATSAPP_TEMPLATE_WITHOUT_CITY_ID =
-  "HX8d27e364385e88a37b96a5372ed0db17";
+  "HX8f45a99d20dc18fda97212be7f23a1c5";
 
 export const WHATSAPP_SENDER_ID = process.env["TWILIO_MESSAGING_SID"];
 export const WHATSAPP_GENERIC_REPLY = `Você está em um canal de mensagens automáticas. Mas saiba que estamos aqui para ajudar!
