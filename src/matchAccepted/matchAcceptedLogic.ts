@@ -3,6 +3,27 @@ import { LAMBDA_MATCH_URL } from "../constants";
 import client from "../prismaClient";
 import updateTicket from "../zendeskClient/updateTicket";
 
+export async function checkShouldMakeVolunteerAvailable(volunteerId: number) {
+  const volunteerAvailability = await client.volunteerAvailability.findUnique({
+    where: {
+      volunteer_id: volunteerId,
+    },
+    select: {
+      current_matches: true,
+      max_matches: true,
+    },
+  });
+
+  if (volunteerAvailability) {
+    const shouldMakeVolunteerAvailable =
+      volunteerAvailability.current_matches + 1 <
+      volunteerAvailability.max_matches;
+    return shouldMakeVolunteerAvailable;
+  }
+
+  return false;
+}
+
 export async function confirmMatchConfirmation(
   matchConfirmationId: number,
   matchId: number

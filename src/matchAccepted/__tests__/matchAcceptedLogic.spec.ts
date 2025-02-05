@@ -1,9 +1,11 @@
 import { LAMBDA_MATCH_URL } from "../../constants";
+import { prismaMock } from "../../setupTests";
 import {
   matchConfirmationMock,
   msrZendeskTicketMock,
   supportRequestMock,
   updateTicketMock,
+  volunteerAvailabilityMock,
   volunteerMock,
 } from "../../matchConfirmation/__mocks__";
 import {
@@ -14,9 +16,42 @@ import {
 } from "../__mocks__";
 import {
   authenticateMatch,
+  checkShouldMakeVolunteerAvailable,
   createMatch,
   updateTicketWithConfirmation,
 } from "../matchAcceptedLogic";
+
+describe("checkShouldMakeVolunteerAvailable", () => {
+  it("should return true if volunteer is available for new matches besides the current one", async () => {
+    prismaMock.volunteerAvailability.findUnique.mockResolvedValue({
+      ...volunteerAvailabilityMock,
+      current_matches: 0,
+      max_matches: 3,
+    });
+
+    const shouldMakeVolunteerAvailable =
+      await checkShouldMakeVolunteerAvailable(
+        volunteerAvailabilityMock.volunteer_id
+      );
+
+    expect(shouldMakeVolunteerAvailable).toStrictEqual(true);
+  });
+
+  it("should return false if volunteer is not available for new matches besides the current one", async () => {
+    prismaMock.volunteerAvailability.findUnique.mockResolvedValue({
+      ...volunteerAvailabilityMock,
+      current_matches: 2,
+      max_matches: 3,
+    });
+
+    const shouldMakeVolunteerAvailable =
+      await checkShouldMakeVolunteerAvailable(
+        volunteerAvailabilityMock.volunteer_id
+      );
+
+    expect(shouldMakeVolunteerAvailable).toStrictEqual(false);
+  });
+});
 
 describe("updateTicketWithConfirmation", () => {
   it("should call updateTicket with correct params", async () => {

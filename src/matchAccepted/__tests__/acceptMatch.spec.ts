@@ -25,6 +25,11 @@ const confirmMatchConfirmationMock = jest.spyOn(
   "confirmMatchConfirmation"
 );
 
+const checkShouldMakeVolunteerAvailableMock = jest.spyOn(
+  matchAcceptedLogic,
+  "checkShouldMakeVolunteerAvailable"
+);
+
 const makeVolunteerAvailableMock = jest.spyOn(
   matchDeniedLogic,
   "makeVolunteerAvailable"
@@ -36,15 +41,6 @@ describe("acceptMatch", () => {
     updateUserMock.mockResolvedValueOnce(updatedUserMock);
     authenticateMatchMock.mockResolvedValueOnce("abc");
     createMatchMock.mockResolvedValueOnce(matchMock);
-  });
-
-  it("should call makeVolunteerAvailable with correct params", async () => {
-    await acceptMatch(matchConfirmationMock, supportRequestMock, volunteerMock);
-
-    expect(makeVolunteerAvailableMock).toHaveBeenNthCalledWith(
-      1,
-      volunteerMock
-    );
   });
 
   it("should call updateTicketWithConfirmation with correct params", async () => {
@@ -70,6 +66,37 @@ describe("acceptMatch", () => {
       1,
       matchConfirmationMock,
       "abc"
+    );
+  });
+
+  it("should call checkShouldMakeVolunteerAvailable with correct params", async () => {
+    await acceptMatch(matchConfirmationMock, supportRequestMock, volunteerMock);
+
+    expect(checkShouldMakeVolunteerAvailableMock).toHaveBeenNthCalledWith(
+      1,
+      volunteerMock.id
+    );
+  });
+
+  it("if checkShouldMakeVolunteerAvailable returns true, it should call makeVolunteerAvailable with correct params", async () => {
+    checkShouldMakeVolunteerAvailableMock.mockResolvedValueOnce(true);
+
+    await acceptMatch(matchConfirmationMock, supportRequestMock, volunteerMock);
+
+    expect(makeVolunteerAvailableMock).toHaveBeenNthCalledWith(
+      1,
+      volunteerMock
+    );
+  });
+
+  it("if checkShouldMakeVolunteerAvailable returns false, it should not call makeVolunteerAvailable", async () => {
+    checkShouldMakeVolunteerAvailableMock.mockResolvedValueOnce(false);
+
+    await acceptMatch(matchConfirmationMock, supportRequestMock, volunteerMock);
+
+    expect(makeVolunteerAvailableMock).not.toHaveBeenNthCalledWith(
+      1,
+      volunteerMock
     );
   });
 
