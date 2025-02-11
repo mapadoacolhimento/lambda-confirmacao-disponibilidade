@@ -8,6 +8,7 @@ import type {
   SupportRequestsStatus,
   VolunteerAvailability,
   Volunteers,
+  VolunteerStatusHistory,
 } from "@prisma/client";
 import type { ZendeskTicket, ZendeskUser } from "../../types";
 import * as updateTicket from "../../zendeskClient/updateTicket";
@@ -33,6 +34,10 @@ export const volunteerMock = {
 export const volunteerAvailabilityMock = {
   volunteer_id: 2,
 } as VolunteerAvailability;
+
+export const volunteerStatusHistoryMock = {
+  status: "disponivel",
+} as VolunteerStatusHistory;
 
 export const matchConfirmationMock = {
   matchConfirmationId: 1,

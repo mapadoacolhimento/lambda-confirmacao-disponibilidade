@@ -6,11 +6,14 @@ import {
   updateUserMock,
   volunteerAvailabilityMock,
   volunteerMock,
+  volunteerStatusHistoryMock,
 } from "../../matchConfirmation/__mocks__";
 import { prismaMock } from "../../setupTests";
 import {
+  fetchPreviousVolunteerStatus,
   makeVolunteerAvailable,
   updateTicketWithDenial,
+  updateVolunteerStatusToPreviousValue,
 } from "../matchDeniedLogic";
 
 describe("updateTicketWithDenial", () => {
@@ -65,5 +68,64 @@ describe("makeVolunteerAvailable", () => {
     const res = await makeVolunteerAvailable(volunteerMock);
 
     expect(res).toStrictEqual(volunteerMock);
+  });
+});
+
+describe("fetchPreviousVolunteerStatus", () => {
+  it("should throw an error if no previous status was found", async () => {
+    prismaMock.volunteerStatusHistory.findFirstOrThrow.mockRejectedValueOnce(
+      new Error("Volunteer status not found")
+    );
+
+    await expect(
+      fetchPreviousVolunteerStatus(volunteerMock.id)
+    ).rejects.toThrow("Volunteer status not found");
+  });
+
+  it("should return the volunteer status", async () => {
+    prismaMock.volunteerStatusHistory.findFirstOrThrow.mockResolvedValue(
+      volunteerStatusHistoryMock
+    );
+
+    const previousStatus = await fetchPreviousVolunteerStatus(volunteerMock.id);
+
+    expect(previousStatus).toStrictEqual(volunteerStatusHistoryMock.status);
+  });
+});
+
+describe("updateVolunteerStatusToPreviousValue", () => {
+  it("should throw an error if no volunteer was updated on Zendesk", async () => {
+    updateUserMock.mockResolvedValueOnce(null);
+
+    await expect(
+      updateVolunteerStatusToPreviousValue(
+        volunteerMock,
+        volunteerStatusHistoryMock.status
+      )
+    ).rejects.toThrow("Couldn't update volunteer Zendesk status");
+  });
+
+  it("should update volunteer condition to previousValue and return this entry", async () => {
+    updateUserMock.mockResolvedValueOnce(updatedUserMock);
+    prismaMock.volunteerStatusHistory.create.mockResolvedValue(
+      volunteerStatusHistoryMock
+    );
+    prismaMock.volunteers.update.mockResolvedValue({
+      ...volunteerMock,
+      condition: volunteerStatusHistoryMock.status,
+    });
+    prismaMock.volunteerAvailability.update.mockResolvedValue(
+      volunteerAvailabilityMock
+    );
+
+    const res = await updateVolunteerStatusToPreviousValue(
+      volunteerMock,
+      volunteerStatusHistoryMock.status
+    );
+
+    expect(res).toStrictEqual({
+      ...volunteerMock,
+      condition: volunteerStatusHistoryMock.status,
+    });
   });
 });
