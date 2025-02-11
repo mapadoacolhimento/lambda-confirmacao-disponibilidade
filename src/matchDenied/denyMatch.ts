@@ -6,8 +6,9 @@ import type {
 import {
   addSupportRequestToQueue,
   denyMatchConfirmation,
-  makeVolunteerAvailable,
+  fetchPreviousVolunteerStatus,
   updateTicketWithDenial,
+  updateVolunteerStatusToPreviousValue,
 } from "./matchDeniedLogic";
 
 export default async function denyMatch(
@@ -27,5 +28,12 @@ export default async function denyMatch(
 
   await addSupportRequestToQueue(matchConfirmation.supportRequestId);
 
-  await makeVolunteerAvailable(volunteer);
+  const previousVolunteerStatus = await fetchPreviousVolunteerStatus(
+    volunteer.id
+  );
+
+  await updateVolunteerStatusToPreviousValue(
+    volunteer,
+    previousVolunteerStatus
+  );
 }

@@ -1,9 +1,11 @@
 import { LAMBDA_MATCH_URL } from "../../constants";
+import { prismaMock } from "../../setupTests";
 import {
   matchConfirmationMock,
   msrZendeskTicketMock,
   supportRequestMock,
   updateTicketMock,
+  volunteerAvailabilityMock,
   volunteerMock,
 } from "../../matchConfirmation/__mocks__";
 import {
@@ -14,9 +16,40 @@ import {
 } from "../__mocks__";
 import {
   authenticateMatch,
+  checkMaxMatches,
   createMatch,
   updateTicketWithConfirmation,
 } from "../matchAcceptedLogic";
+
+describe("checkMaxMatches", () => {
+  it("should return true if volunteer has reached the max number of matches", async () => {
+    prismaMock.volunteerAvailability.findUnique.mockResolvedValue({
+      ...volunteerAvailabilityMock,
+      current_matches: 2,
+      max_matches: 3,
+    });
+
+    const hasReachedMaxMatches = await checkMaxMatches(
+      volunteerAvailabilityMock.volunteer_id
+    );
+
+    expect(hasReachedMaxMatches).toStrictEqual(true);
+  });
+
+  it("should return false if volunteer is still available for new matches", async () => {
+    prismaMock.volunteerAvailability.findUnique.mockResolvedValue({
+      ...volunteerAvailabilityMock,
+      current_matches: 0,
+      max_matches: 3,
+    });
+
+    const hasReachedMaxMatches = await checkMaxMatches(
+      volunteerAvailabilityMock.volunteer_id
+    );
+
+    expect(hasReachedMaxMatches).toStrictEqual(false);
+  });
+});
 
 describe("updateTicketWithConfirmation", () => {
   it("should call updateTicket with correct params", async () => {

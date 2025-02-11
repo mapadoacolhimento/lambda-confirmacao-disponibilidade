@@ -5,11 +5,15 @@ import type {
 } from "@prisma/client";
 import {
   authenticateMatch,
+  checkMaxMatches,
   confirmMatchConfirmation,
   createMatch,
   updateTicketWithConfirmation,
 } from "./matchAcceptedLogic";
-import { makeVolunteerAvailable } from "../matchDenied/matchDeniedLogic";
+import {
+  fetchPreviousVolunteerStatus,
+  updateVolunteerStatusToPreviousValue,
+} from "../matchDenied/matchDeniedLogic";
 
 export default async function acceptMatch(
   matchConfirmation: Pick<
@@ -23,13 +27,23 @@ export default async function acceptMatch(
   supportRequest: Pick<SupportRequests, "zendeskTicketId">,
   volunteer: Pick<Volunteers, "id" | "firstName" | "zendeskUserId">
 ) {
-  await makeVolunteerAvailable(volunteer);
-
   await updateTicketWithConfirmation(supportRequest.zendeskTicketId, volunteer);
 
   const authToken = await authenticateMatch();
 
   const match = await createMatch(matchConfirmation, authToken);
+
+  const hasReachedMaxMatches = await checkMaxMatches(volunteer.id);
+
+  if (!hasReachedMaxMatches) {
+    const previousVolunteerStatus = await fetchPreviousVolunteerStatus(
+      volunteer.id
+    );
+    await updateVolunteerStatusToPreviousValue(
+      volunteer,
+      previousVolunteerStatus
+    );
+  }
 
   await confirmMatchConfirmation(
     matchConfirmation.matchConfirmationId,

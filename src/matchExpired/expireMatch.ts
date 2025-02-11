@@ -4,7 +4,8 @@ import {
 } from "../matchConfirmation/matchConfirmationLogic";
 import {
   addSupportRequestToQueue,
-  makeVolunteerAvailable,
+  fetchPreviousVolunteerStatus,
+  updateVolunteerStatusToPreviousValue,
 } from "../matchDenied/matchDeniedLogic";
 import { sendExpirationReply } from "../reply/replyLogic";
 import {
@@ -28,7 +29,14 @@ export default async function expireMatch(matchConfirmationId: number) {
 
   await addSupportRequestToQueue(matchConfirmation.supportRequestId);
 
-  await makeVolunteerAvailable(volunteer);
+  const previousVolunteerStatus = await fetchPreviousVolunteerStatus(
+    volunteer.id
+  );
+
+  await updateVolunteerStatusToPreviousValue(
+    volunteer,
+    previousVolunteerStatus
+  );
 
   await sendExpirationReply(volunteer.phone);
 

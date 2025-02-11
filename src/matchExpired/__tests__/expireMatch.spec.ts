@@ -7,6 +7,7 @@ import {
   updateTicketMock,
   updateUserMock,
   volunteerMock,
+  volunteerStatusHistoryMock,
 } from "../../matchConfirmation/__mocks__";
 import * as matchConfirmationLogic from "../../matchConfirmation/matchConfirmationLogic";
 import * as matchExpiredLogic from "../matchExpiredLogic";
@@ -40,9 +41,14 @@ const addSupportRequestToQueueMock = jest.spyOn(
   "addSupportRequestToQueue"
 );
 
-const makeVolunteerAvailableMock = jest.spyOn(
+const fetchPreviousVolunteerStatusMock = jest.spyOn(
   matchDeniedLogic,
-  "makeVolunteerAvailable"
+  "fetchPreviousVolunteerStatus"
+);
+
+const updateVolunteerStatusToPreviousValueMock = jest.spyOn(
+  matchDeniedLogic,
+  "updateVolunteerStatusToPreviousValue"
 );
 
 const sendExpirationReplyMock = jest.spyOn(replyLogic, "sendExpirationReply");
@@ -59,6 +65,9 @@ describe("expireMatch", () => {
     );
     prismaMock.volunteers.findUniqueOrThrow.mockResolvedValueOnce(
       volunteerMock
+    );
+    prismaMock.volunteerStatusHistory.findFirstOrThrow.mockResolvedValueOnce(
+      volunteerStatusHistoryMock
     );
     sendOpenReplyMock.mockResolvedValue(replyMock);
   });
@@ -117,12 +126,22 @@ describe("expireMatch", () => {
     );
   });
 
-  it("should call makeVolunteerAvailable with correct params", async () => {
+  it("should call fetchPreviousVolunteerStatus with correct params", async () => {
     await expireMatch(matchConfirmationMock.matchConfirmationId);
 
-    expect(makeVolunteerAvailableMock).toHaveBeenNthCalledWith(
+    expect(fetchPreviousVolunteerStatusMock).toHaveBeenNthCalledWith(
       1,
-      volunteerMock
+      volunteerMock.id
+    );
+  });
+
+  it("should call updateVolunteerStatusToPreviousValue with correct params", async () => {
+    await expireMatch(matchConfirmationMock.matchConfirmationId);
+
+    expect(updateVolunteerStatusToPreviousValueMock).toHaveBeenNthCalledWith(
+      1,
+      volunteerMock,
+      volunteerStatusHistoryMock.status
     );
   });
 

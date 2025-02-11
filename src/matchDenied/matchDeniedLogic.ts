@@ -6,6 +6,7 @@ import {
   ZENDESK_CUSTOM_FIELDS_DICIO,
   ZENDESK_TICKET_WAITING_FOR_MATCH_STATUS,
   ZENDESK_USER_AVAILABLE_STATUS,
+  ZENDESK_USER_WAITING_FOR_CONFIRMATION_STATUS,
 } from "../constants";
 import updateUser from "../zendeskClient/updateUser";
 
@@ -72,12 +73,32 @@ export async function addSupportRequestToQueue(supportRequestId: number) {
   });
 }
 
-export async function makeVolunteerAvailable(
-  volunteer: Pick<Volunteers, "id" | "zendeskUserId">
+export async function fetchPreviousVolunteerStatus(volunteerId: number) {
+  const previousStatus = await client.volunteerStatusHistory.findFirstOrThrow({
+    where: {
+      volunteer_id: volunteerId,
+      status: {
+        not: ZENDESK_USER_WAITING_FOR_CONFIRMATION_STATUS,
+      },
+    },
+    orderBy: {
+      created_at: "desc",
+    },
+    select: {
+      status: true,
+    },
+  });
+
+  return previousStatus.status;
+}
+
+export async function updateVolunteerStatusToPreviousValue(
+  volunteer: Pick<Volunteers, "id" | "zendeskUserId">,
+  previousStatus: string
 ) {
   const volunteerZendeskUser: Pick<ZendeskUser, "id" | "user_fields"> = {
     id: volunteer.zendeskUserId as bigint,
-    user_fields: { condition: ZENDESK_USER_AVAILABLE_STATUS },
+    user_fields: { condition: previousStatus },
   };
   const updatedZendeskUser = await updateUser(volunteerZendeskUser);
 
@@ -91,7 +112,7 @@ export async function makeVolunteerAvailable(
       id: volunteer.id,
     },
     data: {
-      condition: ZENDESK_USER_AVAILABLE_STATUS,
+      condition: previousStatus,
       updated_at: new Date().toISOString(),
     },
   });
@@ -99,7 +120,7 @@ export async function makeVolunteerAvailable(
   await client.volunteerStatusHistory.create({
     data: {
       volunteer_id: volunteer.id,
-      status: ZENDESK_USER_AVAILABLE_STATUS,
+      status: previousStatus,
       created_at: new Date().toISOString(),
     },
   });
@@ -109,7 +130,7 @@ export async function makeVolunteerAvailable(
       volunteer_id: volunteer.id,
     },
     data: {
-      is_available: true,
+      is_available: previousStatus == ZENDESK_USER_AVAILABLE_STATUS,
       updated_at: new Date().toISOString(),
     },
   });

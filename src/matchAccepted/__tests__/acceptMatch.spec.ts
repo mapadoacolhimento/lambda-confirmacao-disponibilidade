@@ -25,9 +25,16 @@ const confirmMatchConfirmationMock = jest.spyOn(
   "confirmMatchConfirmation"
 );
 
-const makeVolunteerAvailableMock = jest.spyOn(
+const checkMaxMatchesMock = jest.spyOn(matchAcceptedLogic, "checkMaxMatches");
+
+const fetchPreviousVolunteerStatusMock = jest.spyOn(
   matchDeniedLogic,
-  "makeVolunteerAvailable"
+  "fetchPreviousVolunteerStatus"
+);
+
+const updateVolunteerStatusToPreviousValueMock = jest.spyOn(
+  matchDeniedLogic,
+  "updateVolunteerStatusToPreviousValue"
 );
 
 describe("acceptMatch", () => {
@@ -36,15 +43,7 @@ describe("acceptMatch", () => {
     updateUserMock.mockResolvedValueOnce(updatedUserMock);
     authenticateMatchMock.mockResolvedValueOnce("abc");
     createMatchMock.mockResolvedValueOnce(matchMock);
-  });
-
-  it("should call makeVolunteerAvailable with correct params", async () => {
-    await acceptMatch(matchConfirmationMock, supportRequestMock, volunteerMock);
-
-    expect(makeVolunteerAvailableMock).toHaveBeenNthCalledWith(
-      1,
-      volunteerMock
-    );
+    checkMaxMatchesMock.mockResolvedValueOnce(true);
   });
 
   it("should call updateTicketWithConfirmation with correct params", async () => {
@@ -71,6 +70,50 @@ describe("acceptMatch", () => {
       matchConfirmationMock,
       "abc"
     );
+  });
+
+  it("should call checkMaxMatches with correct params", async () => {
+    await acceptMatch(matchConfirmationMock, supportRequestMock, volunteerMock);
+
+    expect(checkMaxMatchesMock).toHaveBeenNthCalledWith(1, volunteerMock.id);
+  });
+
+  it("if checkMaxMatches returns false, it should call fetchPreviousVolunteerStatus with correct params", async () => {
+    checkMaxMatchesMock.mockReset();
+    checkMaxMatchesMock.mockResolvedValueOnce(false);
+    fetchPreviousVolunteerStatusMock.mockResolvedValueOnce("disponivel");
+
+    await acceptMatch(matchConfirmationMock, supportRequestMock, volunteerMock);
+
+    expect(fetchPreviousVolunteerStatusMock).toHaveBeenNthCalledWith(
+      1,
+      volunteerMock.id
+    );
+  });
+
+  it("if checkMaxMatches returns false, it should call updateVolunteerStatusToPreviousValue with correct params", async () => {
+    checkMaxMatchesMock.mockReset();
+    checkMaxMatchesMock.mockResolvedValueOnce(false);
+    fetchPreviousVolunteerStatusMock.mockResolvedValueOnce("disponivel");
+
+    await acceptMatch(matchConfirmationMock, supportRequestMock, volunteerMock);
+
+    expect(updateVolunteerStatusToPreviousValueMock).toHaveBeenNthCalledWith(
+      1,
+      volunteerMock,
+      "disponivel"
+    );
+  });
+
+  it("if checkMaxMatches returns true, it should not call updateVolunteerStatusToPreviousValue", async () => {
+    checkMaxMatchesMock.mockReset();
+    checkMaxMatchesMock.mockResolvedValueOnce(true);
+
+    await acceptMatch(matchConfirmationMock, supportRequestMock, volunteerMock);
+
+    expect(
+      updateVolunteerStatusToPreviousValueMock
+    ).not.toHaveBeenNthCalledWith(1, volunteerMock);
   });
 
   it("should call confirmMatchConfirmation with correct params", async () => {
