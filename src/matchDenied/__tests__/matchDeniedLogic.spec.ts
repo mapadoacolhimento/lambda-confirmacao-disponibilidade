@@ -11,7 +11,6 @@ import {
 import { prismaMock } from "../../setupTests";
 import {
   fetchPreviousVolunteerStatus,
-  makeVolunteerAvailable,
   updateTicketWithDenial,
   updateVolunteerStatusToPreviousValue,
 } from "../matchDeniedLogic";
@@ -46,28 +45,6 @@ describe("updateTicketWithDenial", () => {
     await expect(
       updateTicketWithDenial(supportRequestMock.zendeskTicketId, volunteerMock)
     ).rejects.toThrow("Couldn't update msr Zendesk ticket");
-  });
-});
-
-describe("makeVolunteerAvailable", () => {
-  it("should throw an error if no volunteer was updated on Zendesk", async () => {
-    updateUserMock.mockResolvedValueOnce(null);
-
-    await expect(makeVolunteerAvailable(volunteerMock)).rejects.toThrow(
-      "Couldn't update volunteer Zendesk status"
-    );
-  });
-
-  it("should update volunteer condition to disponivel and return this entry", async () => {
-    updateUserMock.mockResolvedValueOnce(updatedUserMock);
-    prismaMock.volunteers.update.mockResolvedValue(volunteerMock);
-    prismaMock.volunteerAvailability.update.mockResolvedValue(
-      volunteerAvailabilityMock
-    );
-
-    const res = await makeVolunteerAvailable(volunteerMock);
-
-    expect(res).toStrictEqual(volunteerMock);
   });
 });
 
