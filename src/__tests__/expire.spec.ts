@@ -10,6 +10,7 @@ import {
   updateTicketMock,
   updateUserMock,
   volunteerMock,
+  volunteerStatusHistoryMock,
 } from "../matchConfirmation/__mocks__";
 import type { MSRPiiSec } from "@prisma/client";
 import { replyMock, sendOpenReplyMock } from "../reply/__mocks__";
@@ -106,6 +107,9 @@ describe("/expire endpoint", () => {
     );
     prismaMock.volunteers.findUniqueOrThrow.mockResolvedValueOnce(
       volunteerMock
+    );
+    prismaMock.volunteerStatusHistory.findFirstOrThrow.mockResolvedValueOnce(
+      volunteerStatusHistoryMock
     );
     sendOpenReplyMock.mockResolvedValue(replyMock);
 
