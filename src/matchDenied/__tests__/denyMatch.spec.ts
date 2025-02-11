@@ -7,8 +7,10 @@ import {
   updateTicketMock,
   updateUserMock,
   volunteerMock,
+  volunteerStatusHistoryMock,
 } from "../../matchConfirmation/__mocks__";
 import denyMatch from "../denyMatch";
+import { prismaMock } from "../../setupTests";
 
 const updateTicketWithDenialMock = jest.spyOn(
   matchDeniedLogic,
@@ -23,15 +25,23 @@ const addSupportRequestToQueueMock = jest.spyOn(
   "addSupportRequestToQueue"
 );
 
-const makeVolunteerAvailableMock = jest.spyOn(
+const fetchPreviousVolunteerStatusMock = jest.spyOn(
   matchDeniedLogic,
-  "makeVolunteerAvailable"
+  "fetchPreviousVolunteerStatus"
+);
+
+const updateVolunteerStatusToPreviousValueMock = jest.spyOn(
+  matchDeniedLogic,
+  "updateVolunteerStatusToPreviousValue"
 );
 
 describe("denyMatch", () => {
   beforeEach(() => {
     updateTicketMock.mockResolvedValueOnce(msrZendeskTicketMock);
     updateUserMock.mockResolvedValueOnce(updatedUserMock);
+    prismaMock.volunteerStatusHistory.findFirstOrThrow.mockResolvedValueOnce(
+      volunteerStatusHistoryMock
+    );
   });
 
   it("should call updateTicketWithDenial with correct params", async () => {
@@ -62,12 +72,22 @@ describe("denyMatch", () => {
     );
   });
 
-  it("should call makeVolunteerAvailable with correct params", async () => {
+  it("should call fetchPreviousVolunteerStatus with correct params", async () => {
     await denyMatch(matchConfirmationMock, supportRequestMock, volunteerMock);
 
-    expect(makeVolunteerAvailableMock).toHaveBeenNthCalledWith(
+    expect(fetchPreviousVolunteerStatusMock).toHaveBeenNthCalledWith(
       1,
-      volunteerMock
+      volunteerMock.id
+    );
+  });
+
+  it("should call updateVolunteerStatusToPreviousValue with correct params", async () => {
+    await denyMatch(matchConfirmationMock, supportRequestMock, volunteerMock);
+
+    expect(updateVolunteerStatusToPreviousValueMock).toHaveBeenNthCalledWith(
+      1,
+      volunteerMock,
+      volunteerStatusHistoryMock.status
     );
   });
 });
