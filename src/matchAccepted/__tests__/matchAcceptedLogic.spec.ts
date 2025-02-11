@@ -16,40 +16,38 @@ import {
 } from "../__mocks__";
 import {
   authenticateMatch,
-  checkShouldMakeVolunteerAvailable,
+  checkMaxMatches,
   createMatch,
   updateTicketWithConfirmation,
 } from "../matchAcceptedLogic";
 
-describe("checkShouldMakeVolunteerAvailable", () => {
-  it("should return true if volunteer is available for new matches besides the current one", async () => {
-    prismaMock.volunteerAvailability.findUnique.mockResolvedValue({
-      ...volunteerAvailabilityMock,
-      current_matches: 0,
-      max_matches: 3,
-    });
-
-    const shouldMakeVolunteerAvailable =
-      await checkShouldMakeVolunteerAvailable(
-        volunteerAvailabilityMock.volunteer_id
-      );
-
-    expect(shouldMakeVolunteerAvailable).toStrictEqual(true);
-  });
-
-  it("should return false if volunteer is not available for new matches besides the current one", async () => {
+describe("checkMaxMatches", () => {
+  it("should return true if volunteer has reached the max number of matches", async () => {
     prismaMock.volunteerAvailability.findUnique.mockResolvedValue({
       ...volunteerAvailabilityMock,
       current_matches: 2,
       max_matches: 3,
     });
 
-    const shouldMakeVolunteerAvailable =
-      await checkShouldMakeVolunteerAvailable(
-        volunteerAvailabilityMock.volunteer_id
-      );
+    const hasReachedMaxMatches = await checkMaxMatches(
+      volunteerAvailabilityMock.volunteer_id
+    );
 
-    expect(shouldMakeVolunteerAvailable).toStrictEqual(false);
+    expect(hasReachedMaxMatches).toStrictEqual(true);
+  });
+
+  it("should return false if volunteer is still available for new matches", async () => {
+    prismaMock.volunteerAvailability.findUnique.mockResolvedValue({
+      ...volunteerAvailabilityMock,
+      current_matches: 0,
+      max_matches: 3,
+    });
+
+    const hasReachedMaxMatches = await checkMaxMatches(
+      volunteerAvailabilityMock.volunteer_id
+    );
+
+    expect(hasReachedMaxMatches).toStrictEqual(false);
   });
 });
 
