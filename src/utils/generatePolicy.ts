@@ -1,4 +1,8 @@
-import type { APIGatewayAuthorizerResult, Statement } from "aws-lambda";
+import type {
+  APIGatewayAuthorizerResult,
+  Statement,
+  StatementEffect,
+} from "aws-lambda";
 
 export const denyPolicy = (
   principalId: string,
@@ -21,7 +25,7 @@ export const generatePolicy = (
 ): APIGatewayAuthorizerResult => {
   const statementOne: Statement = {
     Action: "execute-api:Invoke", // default action
-    Effect: effect,
+    Effect: effect as StatementEffect,
     Resource: resource,
   };
 
