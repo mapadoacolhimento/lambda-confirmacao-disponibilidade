@@ -73,6 +73,28 @@ export async function createMatchConfirmation(
   return matchConfirmation;
 }
 
+export async function undeliveredMatchConfirmation(
+  matchConfirmationId: number
+) {
+  await client.matchConfirmations.update({
+    where: {
+      matchConfirmationId: matchConfirmationId,
+    },
+    data: {
+      status: "undelivered",
+      updatedAt: new Date().toISOString(),
+    },
+  });
+
+  await client.matchConfirmationStatusHistory.create({
+    data: {
+      matchConfirmationId: matchConfirmationId,
+      status: "undelivered",
+      createdAt: new Date().toISOString(),
+    },
+  });
+}
+
 export async function updateSupportRequest(supportRequestId: number) {
   const supportRequest = await client.supportRequests.update({
     where: {
