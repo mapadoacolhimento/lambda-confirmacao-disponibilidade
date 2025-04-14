@@ -27,6 +27,12 @@
     {
       "files": ["prisma/*.mjs"],
       "extends": ["plugin:@typescript-eslint/disable-type-checked"]
+    },
+    {
+      "files": ["*.spec.ts", "*.test.ts"],
+      "rules": {
+        "@typescript-eslint/unbound-method": "off"
+      }
     }
   ]
 }
