@@ -3,6 +3,7 @@ import confirmMatch from "../confirmMatch";
 import { prismaMock } from "../../setupTests";
 import {
   matchConfirmationMock,
+  matchConfirmationStatusHistoryMock,
   matchInfoMock,
   msrZendeskTicketMock,
   sendTemplateMessageMock,
@@ -108,5 +109,50 @@ describe("confirmMatch", () => {
     );
 
     expect(res).toStrictEqual(matchConfirmationMock);
+  });
+});
+
+describe("confirmMatch errors", () => {
+  it("should set matchConfirmation status to 'undelivered' when message sending fails", async () => {
+    prismaMock.matchConfirmations.create.mockResolvedValue(
+      matchConfirmationMock
+    );
+    prismaMock.matchConfirmations.update.mockResolvedValue({
+      ...matchConfirmationMock,
+      status: "undelivered",
+    });
+    prismaMock.matchConfirmationStatusHistory.create.mockResolvedValue(
+      matchConfirmationStatusHistoryMock
+    );
+    sendTemplateMessageMock.mockRejectedValueOnce(
+      new Error(
+        `Couldn't send whatsapp message to volunteer for volunteer_id: ${volunteerMock.id}`
+      )
+    );
+
+    await expect(
+      confirmMatch(supportRequestMock, volunteerMock, matchInfoMock)
+    ).rejects.toThrow(
+      `Couldn't send whatsapp message to volunteer for volunteer_id: ${volunteerMock.id}`
+    );
+
+    expect(createMatchConfimationMock).toHaveBeenNthCalledWith(
+      1,
+      supportRequestMock,
+      volunteerMock.id,
+      matchInfoMock
+    );
+    expect(prismaMock.matchConfirmations.update).toHaveBeenLastCalledWith({
+      where: {
+        matchConfirmationId: matchConfirmationMock.matchConfirmationId,
+      },
+      data: {
+        status: "undelivered",
+        updatedAt: expect.any(String),
+      },
+    });
+    expect(
+      prismaMock.matchConfirmationStatusHistory.create
+    ).toHaveBeenCalledTimes(1);
   });
 });

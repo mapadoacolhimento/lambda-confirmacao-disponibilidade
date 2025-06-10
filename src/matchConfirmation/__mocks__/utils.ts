@@ -52,6 +52,13 @@ export const matchConfirmationMock = {
   updatedAt: new Date(),
 };
 
+export const matchConfirmationStatusHistoryMock = {
+  matchConfirmationStatusHistoryId: 1,
+  matchConfirmationId: 1,
+  status: "undelivered" as MatchConfirmationStatus,
+  createdAt: new Date(),
+};
+
 export const cityMock = {
   city_value: "SAO PAULO",
   city_label: "SÃO PAULO",
