@@ -1,8 +1,9 @@
 {
-  "extends": "@tsconfig/node-lts-strictest/tsconfig.json",
+  //"extends": "@tsconfig/node-lts-strictest/tsconfig.json",
   "include": ["src/**/*", "handler.ts"],
   "exclude": ["coverage", ".serverless", ".webpack", ".webpackCache"],
   "compilerOptions": {
+    "lib": ["es2022"],
     /* Basic Options */
     "incremental": true,
     "declaration": true,
@@ -19,6 +20,27 @@
     "alwaysStrict": true,
     "resolveJsonModule": true,
     "ignoreDeprecations": "5.0",
-    "verbatimModuleSyntax": false
+    "verbatimModuleSyntax": false,
+
+    //@tsconfig/node-lts-strictest/tsconfig.json
+    "module": "commonjs",
+    "target": "es2022",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node",
+    "allowUnusedLabels": false,
+    "allowUnreachableCode": false,
+    "exactOptionalPropertyTypes": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noUncheckedIndexedAccess": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+
+    "checkJs": true
   }
 }
