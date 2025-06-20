@@ -8,6 +8,7 @@ import {
   createMatchConfirmation,
   makeVolunteerUnavailable,
   sendWhatsAppMessage,
+  undeliveredMatchConfirmation,
   updateMsrZendeskTicket,
   updateSupportRequest,
 } from "./matchConfirmationLogic";
@@ -26,11 +27,16 @@ export default async function confirmMatch(
     matchInfo
   );
 
-  await sendWhatsAppMessage(
-    volunteer,
-    supportRequest,
-    matchConfirmation.matchConfirmationId
-  );
+  try {
+    await sendWhatsAppMessage(
+      volunteer,
+      supportRequest,
+      matchConfirmation.matchConfirmationId
+    );
+  } catch (error) {
+    await undeliveredMatchConfirmation(matchConfirmation.matchConfirmationId);
+    throw new Error(error instanceof Error ? error.message : String(error));
+  }
 
   await updateMsrZendeskTicket(supportRequest.zendeskTicketId, volunteer);
 
