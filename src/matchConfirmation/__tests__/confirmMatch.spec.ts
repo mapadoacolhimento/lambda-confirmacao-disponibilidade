@@ -28,7 +28,10 @@ const makeVolunteerUnavailableMock = jest.spyOn(
   confirmationLogic,
   "makeVolunteerUnavailable"
 );
-
+const undeliveredMatchConfirmationMock = jest.spyOn(
+  confirmationLogic,
+  "undeliveredMatchConfirmation"
+);
 const updateMsrZendeskTicketMock = jest
   .spyOn(confirmationLogic, "updateMsrZendeskTicket")
   .mockImplementation(() => Promise.resolve(msrZendeskTicketMock));
@@ -108,5 +111,38 @@ describe("confirmMatch", () => {
     );
 
     expect(res).toStrictEqual(matchConfirmationMock);
+  });
+});
+
+describe("confirmMatch errors", () => {
+  it("should set matchConfirmation status to 'undelivered' when message sending fails", async () => {
+    prismaMock.matchConfirmations.create.mockResolvedValue(
+      matchConfirmationMock
+    );
+    prismaMock.matchConfirmations.update.mockResolvedValue({
+      ...matchConfirmationMock,
+      status: "undelivered",
+    });
+
+    sendTemplateMessageMock.mockRejectedValueOnce(
+      new Error(
+        `Couldn't send whatsapp message to volunteer for volunteer_id: ${volunteerMock.id}`
+      )
+    );
+
+    await expect(
+      confirmMatch(supportRequestMock, volunteerMock, matchInfoMock)
+    ).rejects.toThrow(
+      `Couldn't send whatsapp message to volunteer for volunteer_id: ${volunteerMock.id}`
+    );
+
+    expect(createMatchConfimationMock).toHaveBeenNthCalledWith(
+      1,
+      supportRequestMock,
+      volunteerMock.id,
+      matchInfoMock
+    );
+
+    expect(undeliveredMatchConfirmationMock).toHaveBeenCalledTimes(1);
   });
 });
