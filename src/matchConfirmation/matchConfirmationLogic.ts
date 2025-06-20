@@ -262,3 +262,25 @@ export async function fetchMatchConfirmation(matchConfirmationId: number) {
   });
   return matchConfirmation;
 }
+
+export async function undeliveredMatchConfirmation(
+  matchConfirmationId: number
+) {
+  await client.matchConfirmations.update({
+    where: {
+      matchConfirmationId: matchConfirmationId,
+    },
+    data: {
+      status: "undelivered",
+      updatedAt: new Date().toISOString(),
+    },
+  });
+
+  await client.matchConfirmationStatusHistory.create({
+    data: {
+      matchConfirmationId: matchConfirmationId,
+      status: "undelivered",
+      createdAt: new Date().toISOString(),
+    },
+  });
+}
