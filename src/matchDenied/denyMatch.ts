@@ -31,7 +31,7 @@ export default async function denyMatch(
   const previousVolunteerStatus = await fetchPreviousVolunteerStatus(
     volunteer.id
   );
-
+  console.log(`denyMatch previousVolunteerStatus ${previousVolunteerStatus} `);
   await updateVolunteerStatusToPreviousValue(
     volunteer,
     previousVolunteerStatus

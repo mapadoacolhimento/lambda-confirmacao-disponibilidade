@@ -38,7 +38,9 @@ export async function confirmMatchConfirmation(
       updatedAt: new Date().toISOString(),
     },
   });
-
+  console.log(
+    `confirmMatchConfirmation matchConfirmationId: ${matchConfirmationId} matchId: ${matchId}`
+  );
   await client.matchConfirmationStatusHistory.create({
     data: {
       matchConfirmationId: matchConfirmationId,
@@ -109,7 +111,9 @@ export async function createMatch(
   }
 
   const matchData = (await matchResponse.json()) as { message: Matches };
-
+  console.log(
+    `createMatch matchConfirmationId: ${matchConfirmation.supportRequestId} volunteerId: ${matchConfirmation.volunteerId} matchType: ${matchConfirmation.matchType} matchStage: ${matchConfirmation.matchStage}`
+  );
   const match = matchData.message;
 
   return match;

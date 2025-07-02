@@ -88,7 +88,7 @@ export async function fetchPreviousVolunteerStatus(volunteerId: number) {
       status: true,
     },
   });
-
+  console.log(previousStatus);
   return previousStatus.status;
 }
 
@@ -96,6 +96,7 @@ export async function updateVolunteerStatusToPreviousValue(
   volunteer: Pick<Volunteers, "id" | "zendeskUserId">,
   previousStatus: string
 ) {
+  console.log("Status antigo", previousStatus);
   const volunteerZendeskUser: Pick<ZendeskUser, "id" | "user_fields"> = {
     id: volunteer.zendeskUserId as bigint,
     user_fields: { condition: previousStatus },
@@ -117,6 +118,12 @@ export async function updateVolunteerStatusToPreviousValue(
     },
   });
 
+  console.log(
+    `updateVolunteerStatusToPreviousValue updatedVolunteer ${
+      volunteer.id
+    }  to ${updatedVolunteer ? updatedVolunteer.condition : previousStatus} `
+  );
+
   await client.volunteerStatusHistory.create({
     data: {
       volunteer_id: volunteer.id,
@@ -124,7 +131,9 @@ export async function updateVolunteerStatusToPreviousValue(
       created_at: new Date().toISOString(),
     },
   });
-
+  console.log(
+    `updateVolunteerStatusToPreviousValue created volunteerStatusHistory for volunteer ${volunteer.id} with status ${previousStatus}`
+  );
   await client.volunteerAvailability.update({
     where: {
       volunteer_id: volunteer.id,
@@ -134,6 +143,8 @@ export async function updateVolunteerStatusToPreviousValue(
       updated_at: new Date().toISOString(),
     },
   });
-
+  console.log(
+    `updateVolunteerStatusToPreviousValue updated volunteerAvailability for volunteer ${volunteer.id} with  ${previousStatus}`
+  );
   return updatedVolunteer;
 }

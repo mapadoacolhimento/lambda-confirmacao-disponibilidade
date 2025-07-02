@@ -15,6 +15,10 @@ export default async function handleVolunteerAnswer(
 ) {
   const phone = cleanPhone(from);
 
+  console.log(
+    `handleVolunteerAnswer, from: ${from},buttonText: ${buttonText}, buttonPayload ${buttonPayload} `
+  );
+
   const shouldProcessMatchConfirmation =
     !!buttonPayload &&
     (buttonText === ReplyType.positive || buttonText === ReplyType.negative);

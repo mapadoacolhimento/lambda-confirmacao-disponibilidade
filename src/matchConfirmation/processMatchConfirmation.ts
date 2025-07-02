@@ -20,13 +20,15 @@ export default async function processMatchConfirmation(
     matchConfirmation.supportRequestId,
     matchConfirmation.volunteerId
   );
-
+  console.log(`processMatchConfirmation. volunteer ${volunteer.id} `);
   const shouldAcceptMatch = buttonText === ReplyType.positive;
   if (shouldAcceptMatch) {
+    console.log(`cceptMatch previousVolunteerStatus ${volunteer.id} `);
     await acceptMatch(matchConfirmation, supportRequest, volunteer);
     return matchConfirmation;
   }
 
+  console.log(`denyMatch previousVolunteerStatus  ${volunteer.id} `);
   await denyMatch(matchConfirmation, supportRequest, volunteer);
 
   return matchConfirmation;

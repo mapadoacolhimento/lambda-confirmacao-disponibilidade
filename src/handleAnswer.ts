@@ -45,6 +45,8 @@ export default async function handler(
       (parseParamsToJson(body) as unknown) ||
       (Object.create(null) as Record<string, unknown>);
 
+    console.log("handler, body:", parsedBody);
+
     const validatedBody = await bodySchema.validate(parsedBody);
 
     const {

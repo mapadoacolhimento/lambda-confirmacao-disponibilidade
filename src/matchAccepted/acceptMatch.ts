@@ -34,10 +34,15 @@ export default async function acceptMatch(
   const match = await createMatch(matchConfirmation, authToken);
 
   const hasReachedMaxMatches = await checkMaxMatches(volunteer.id);
-
+  console.log(
+    `acceptMatch hasReachedMaxMatches: ${hasReachedMaxMatches} for volunteer ${volunteer.id}`
+  );
   if (!hasReachedMaxMatches) {
     const previousVolunteerStatus = await fetchPreviousVolunteerStatus(
       volunteer.id
+    );
+    console.log(
+      `acceptMatch previousVolunteerStatus ${previousVolunteerStatus} for volunteer ${volunteer.id}`
     );
     await updateVolunteerStatusToPreviousValue(
       volunteer,
