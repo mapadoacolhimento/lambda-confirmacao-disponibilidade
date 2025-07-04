@@ -98,7 +98,7 @@ export async function fetchPreviousVolunteerStatus(volunteerId: number) {
     return previousStatus.status;
   } catch (error) {
     throw new Error(
-      `[${new Date().toISOString()}] Error fetching previous volunteer status: ${
+      `[${new Date().toISOString()}] Error fetching previous volunteer ${volunteerId} status: ${
         error instanceof Error ? error.message : String(error)
       }`
     );
@@ -155,10 +155,11 @@ export async function updateVolunteerStatusToPreviousValue(
 
     return updatedVolunteer;
   } catch (error) {
-    throw new Error(
+    console.error(
       `[${new Date().toISOString()}] Error updating volunteer Zendesk status: ${
         error instanceof Error ? error.message : String(error)
       }`
     );
+    return null;
   }
 }
