@@ -134,7 +134,11 @@ export async function updateVolunteerStatusToPreviousValue(
         updated_at: new Date().toISOString(),
       },
     });
-
+    console.log(
+      `[${new Date().toISOString()}] Volunteer status updated successfully: ${JSON.stringify(
+        updatedVolunteer
+      )}`
+    );
     await client.volunteerStatusHistory.create({
       data: {
         volunteer_id: volunteer.id,
@@ -142,7 +146,11 @@ export async function updateVolunteerStatusToPreviousValue(
         created_at: new Date().toISOString(),
       },
     });
-
+    console.log(
+      `[${new Date().toISOString()}] Volunteer status history created successfully for volunteerId: ${
+        volunteer.id
+      }`
+    );
     await client.volunteerAvailability.update({
       where: {
         volunteer_id: volunteer.id,
@@ -152,7 +160,11 @@ export async function updateVolunteerStatusToPreviousValue(
         updated_at: new Date().toISOString(),
       },
     });
-
+    console.log(
+      `[${new Date().toISOString()}] Volunteer availability updated successfully for volunteerId: ${
+        volunteer.id
+      }`
+    );
     return updatedVolunteer;
   } catch (error) {
     console.error(
