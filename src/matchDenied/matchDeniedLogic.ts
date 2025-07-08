@@ -135,9 +135,9 @@ export async function updateVolunteerStatusToPreviousValue(
       },
     });
     console.log(
-      `[${new Date().toISOString()}] Volunteer status updated successfully: ${JSON.stringify(
-        updatedVolunteer
-      )}`
+      `[${new Date().toISOString()}] Volunteer status updated successfully: ${
+        updatedVolunteer.id
+      }`
     );
     await client.volunteerStatusHistory.create({
       data: {
