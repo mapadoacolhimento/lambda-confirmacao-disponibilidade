@@ -22,6 +22,9 @@ export default async function denyMatch(
   >,
   volunteer: Pick<Volunteers, "id" | "firstName" | "zendeskUserId">
 ) {
+  console.log(
+    `[handle-answer] Volunteer ${volunteer.id} denied match for support request ${supportRequest.zendeskTicketId}`
+  );
   await updateTicketWithDenial(supportRequest.zendeskTicketId, volunteer);
 
   await denyMatchConfirmation(matchConfirmation.matchConfirmationId);

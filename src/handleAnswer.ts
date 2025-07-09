@@ -64,9 +64,7 @@ export default async function handler(
     if (error["name"] === "ValidationError") {
       const errorMsg = `Validation error: ${getErrorMessage(error)}`;
 
-      console.error(
-        `[handle-answer] - [400]: ${errorMsg} - event.body: ${event.body}`
-      );
+      console.error(`[handle-answer] - [400]: ${errorMsg}`);
 
       return callback(null, {
         statusCode: 400,

@@ -98,7 +98,10 @@ export async function createMatch(
       Authorization: authToken,
     },
   };
-
+  console.log(
+    `[handle-answer] Creating match for support request ${matchConfirmation.supportRequestId} and volunteer ${matchConfirmation.volunteerId}`
+  );
+  console.log(`Request options: ${JSON.stringify(options)}`);
   const matchResponse = await fetch(
     LAMBDA_MATCH_URL + "/create-match",
     options
@@ -107,7 +110,9 @@ export async function createMatch(
   if (matchResponse.status !== 200 || !matchResponse.ok) {
     throw new Error(matchResponse.statusText);
   }
-
+  console.log(
+    `[handle-answer] Created match for support request ${matchConfirmation.supportRequestId} and volunteer ${matchConfirmation.volunteerId}`
+  );
   const matchData = (await matchResponse.json()) as { message: Matches };
 
   const match = matchData.message;
