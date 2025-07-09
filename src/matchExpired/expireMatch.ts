@@ -18,6 +18,9 @@ export default async function expireMatch(matchConfirmationId: number) {
 
   if (!matchConfirmation) return null;
 
+  console.log(
+    `[expire] Expiring match confirmation for match_confirmation_id: ${matchConfirmationId}`
+  );
   const { supportRequest, volunteer } = await fetchSupportRequestAndVolunteer(
     matchConfirmation.supportRequestId,
     matchConfirmation.volunteerId
@@ -33,6 +36,9 @@ export default async function expireMatch(matchConfirmationId: number) {
     volunteer.id
   );
 
+  console.log(
+    `[expire] Updating volunteer status to previous value for volunteerId: ${volunteer.id}`
+  );
   await updateVolunteerStatusToPreviousValue(
     volunteer,
     previousVolunteerStatus

@@ -75,7 +75,7 @@ export async function addSupportRequestToQueue(supportRequestId: number) {
 
 export async function fetchPreviousVolunteerStatus(volunteerId: number) {
   console.log(
-    `[${new Date().toISOString()}] Fetching previous volunteer status for volunteerId: ${volunteerId}`
+    `[handle-answer] Fetching previous volunteer status for volunteerId: ${volunteerId}`
   );
   try {
     const previousStatus = await client.volunteerStatusHistory.findFirstOrThrow(
@@ -98,7 +98,7 @@ export async function fetchPreviousVolunteerStatus(volunteerId: number) {
     return previousStatus.status;
   } catch (error) {
     throw new Error(
-      `[${new Date().toISOString()}] Error fetching previous volunteer ${volunteerId} status: ${
+      `[handle-answer] Error fetching previous volunteer ${volunteerId} status: ${
         error instanceof Error ? error.message : String(error)
       }`
     );
@@ -110,9 +110,7 @@ export async function updateVolunteerStatusToPreviousValue(
   previousStatus: string
 ) {
   console.log(
-    `[${new Date().toISOString()}] Updating volunteer status to previous value: ${previousStatus} for volunteerId: ${
-      volunteer.id
-    }`
+    `Updating volunteer status to previous value: ${previousStatus} for volunteerId: ${volunteer.id}`
   );
   const volunteerZendeskUser: Pick<ZendeskUser, "id" | "user_fields"> = {
     id: volunteer.zendeskUserId as bigint,
@@ -135,9 +133,7 @@ export async function updateVolunteerStatusToPreviousValue(
       },
     });
     console.log(
-      `[${new Date().toISOString()}] Volunteer status updated successfully: ${
-        updatedVolunteer.id
-      }`
+      `Volunteer status updated successfully: ${updatedVolunteer.id}`
     );
     await client.volunteerStatusHistory.create({
       data: {
@@ -147,9 +143,7 @@ export async function updateVolunteerStatusToPreviousValue(
       },
     });
     console.log(
-      `[${new Date().toISOString()}] Volunteer status history created successfully for volunteerId: ${
-        volunteer.id
-      }`
+      `Volunteer status history created successfully for volunteerId: ${volunteer.id}`
     );
     await client.volunteerAvailability.update({
       where: {
@@ -161,14 +155,12 @@ export async function updateVolunteerStatusToPreviousValue(
       },
     });
     console.log(
-      `[${new Date().toISOString()}] Volunteer availability updated successfully for volunteerId: ${
-        volunteer.id
-      }`
+      `Volunteer availability updated successfully for volunteerId: ${volunteer.id}`
     );
     return updatedVolunteer;
   } catch (error) {
     console.error(
-      `[${new Date().toISOString()}] Error updating volunteer Zendesk status: ${
+      `Error updating volunteer status: ${
         error instanceof Error ? error.message : String(error)
       }`
     );
