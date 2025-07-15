@@ -32,9 +32,9 @@ const fetchPreviousVolunteerStatusMock = jest.spyOn(
   "fetchPreviousVolunteerStatus"
 );
 
-const updateVolunteerStatusToPreviousValueMock = jest.spyOn(
+const updateVolunteerStatusMock = jest.spyOn(
   matchDeniedLogic,
-  "updateVolunteerStatusToPreviousValue"
+  "updateVolunteerStatus"
 );
 
 describe("acceptMatch", () => {
@@ -91,29 +91,30 @@ describe("acceptMatch", () => {
     );
   });
 
-  it("if checkMaxMatches returns false, it should call updateVolunteerStatusToPreviousValue with correct params", async () => {
+  it("if checkMaxMatches returns false, it should call updateVolunteerStatus with correct params", async () => {
     checkMaxMatchesMock.mockReset();
     checkMaxMatchesMock.mockResolvedValueOnce(false);
     fetchPreviousVolunteerStatusMock.mockResolvedValueOnce("disponivel");
 
     await acceptMatch(matchConfirmationMock, supportRequestMock, volunteerMock);
 
-    expect(updateVolunteerStatusToPreviousValueMock).toHaveBeenNthCalledWith(
+    expect(updateVolunteerStatusMock).toHaveBeenNthCalledWith(
       1,
       volunteerMock,
       "disponivel"
     );
   });
 
-  it("if checkMaxMatches returns true, it should not call updateVolunteerStatusToPreviousValue", async () => {
+  it("if checkMaxMatches returns true, it should not call fetchPreviousVolunteerStatus", async () => {
     checkMaxMatchesMock.mockReset();
     checkMaxMatchesMock.mockResolvedValueOnce(true);
 
     await acceptMatch(matchConfirmationMock, supportRequestMock, volunteerMock);
 
-    expect(
-      updateVolunteerStatusToPreviousValueMock
-    ).not.toHaveBeenNthCalledWith(1, volunteerMock);
+    expect(fetchPreviousVolunteerStatusMock).not.toHaveBeenNthCalledWith(
+      1,
+      volunteerMock.id
+    );
   });
 
   it("should call confirmMatchConfirmation with correct params", async () => {
