@@ -115,6 +115,11 @@ describe("acceptMatch", () => {
       1,
       volunteerMock.id
     );
+    expect(updateVolunteerStatusMock).toHaveBeenNthCalledWith(
+      1,
+      volunteerMock,
+      "indisponivel_sem_vagas"
+    );
   });
 
   it("should call confirmMatchConfirmation with correct params", async () => {
