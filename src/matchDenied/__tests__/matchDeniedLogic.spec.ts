@@ -12,7 +12,7 @@ import { prismaMock } from "../../setupTests";
 import {
   fetchPreviousVolunteerStatus,
   updateTicketWithDenial,
-  updateVolunteerStatusToPreviousValue,
+  updateVolunteerStatus,
 } from "../matchDeniedLogic";
 
 describe("updateTicketWithDenial", () => {
@@ -70,15 +70,12 @@ describe("fetchPreviousVolunteerStatus", () => {
   });
 });
 
-describe("updateVolunteerStatusToPreviousValue", () => {
+describe("updateVolunteerStatus", () => {
   it("should throw an error if no volunteer was updated on Zendesk", async () => {
     updateUserMock.mockResolvedValueOnce(null);
 
     await expect(
-      updateVolunteerStatusToPreviousValue(
-        volunteerMock,
-        volunteerStatusHistoryMock.status
-      )
+      updateVolunteerStatus(volunteerMock, volunteerStatusHistoryMock.status)
     ).rejects.toThrow("Couldn't update volunteer Zendesk status");
   });
 
@@ -95,7 +92,7 @@ describe("updateVolunteerStatusToPreviousValue", () => {
       volunteerAvailabilityMock
     );
 
-    const res = await updateVolunteerStatusToPreviousValue(
+    const res = await updateVolunteerStatus(
       volunteerMock,
       volunteerStatusHistoryMock.status
     );

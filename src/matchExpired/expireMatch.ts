@@ -5,7 +5,7 @@ import {
 import {
   addSupportRequestToQueue,
   fetchPreviousVolunteerStatus,
-  updateVolunteerStatusToPreviousValue,
+  updateVolunteerStatus,
 } from "../matchDenied/matchDeniedLogic";
 import { sendExpirationReply } from "../reply/replyLogic";
 import {
@@ -39,10 +39,7 @@ export default async function expireMatch(matchConfirmationId: number) {
   console.log(
     `[expire] Updating volunteer status to previous value for volunteerId: ${volunteer.id}`
   );
-  await updateVolunteerStatusToPreviousValue(
-    volunteer,
-    previousVolunteerStatus
-  );
+  await updateVolunteerStatus(volunteer, previousVolunteerStatus);
 
   await sendExpirationReply(volunteer.phone);
 
