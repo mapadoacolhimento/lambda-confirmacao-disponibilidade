@@ -35,9 +35,9 @@ export default async function acceptMatch(
 
   const authToken = await authenticateMatch();
 
-  const match = await createMatch(matchConfirmation, authToken);
-
   const hasReachedMaxMatches = await checkMaxMatches(volunteer.id);
+
+  const match = await createMatch(matchConfirmation, authToken);
 
   let volunteerStatus: string = ZENDESK_USER_UNAVAILABLE_STATUS;
   if (!hasReachedMaxMatches) {
