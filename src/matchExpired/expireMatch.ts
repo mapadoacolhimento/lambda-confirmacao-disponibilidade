@@ -36,9 +36,6 @@ export default async function expireMatch(matchConfirmationId: number) {
     volunteer.id
   );
 
-  console.log(
-    `[expire] Updating volunteer status to previous value for volunteerId: ${volunteer.id}`
-  );
   await updateVolunteerStatus(volunteer, previousVolunteerStatus);
 
   await sendExpirationReply(volunteer.phone);

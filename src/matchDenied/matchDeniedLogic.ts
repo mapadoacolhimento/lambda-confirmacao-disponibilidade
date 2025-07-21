@@ -132,9 +132,7 @@ export async function updateVolunteerStatus(
         updated_at: new Date().toISOString(),
       },
     });
-    console.log(
-      `Volunteer status updated successfully: ${updatedVolunteer.id}`
-    );
+
     await client.volunteerStatusHistory.create({
       data: {
         volunteer_id: volunteer.id,
@@ -142,9 +140,7 @@ export async function updateVolunteerStatus(
         created_at: new Date().toISOString(),
       },
     });
-    console.log(
-      `Volunteer status history created successfully for volunteerId: ${volunteer.id}`
-    );
+
     await client.volunteerAvailability.update({
       where: {
         volunteer_id: volunteer.id,
@@ -154,9 +150,6 @@ export async function updateVolunteerStatus(
         updated_at: new Date().toISOString(),
       },
     });
-    console.log(
-      `Volunteer availability updated successfully for volunteerId: ${volunteer.id}`
-    );
     return updatedVolunteer;
   } catch (error) {
     console.error(
