@@ -46,9 +46,9 @@ const fetchPreviousVolunteerStatusMock = jest.spyOn(
   "fetchPreviousVolunteerStatus"
 );
 
-const updateVolunteerStatusToPreviousValueMock = jest.spyOn(
+const updateVolunteerStatusMock = jest.spyOn(
   matchDeniedLogic,
-  "updateVolunteerStatusToPreviousValue"
+  "updateVolunteerStatus"
 );
 
 const sendExpirationReplyMock = jest.spyOn(replyLogic, "sendExpirationReply");
@@ -135,10 +135,10 @@ describe("expireMatch", () => {
     );
   });
 
-  it("should call updateVolunteerStatusToPreviousValue with correct params", async () => {
+  it("should call updateVolunteerStatus with correct params", async () => {
     await expireMatch(matchConfirmationMock.matchConfirmationId);
 
-    expect(updateVolunteerStatusToPreviousValueMock).toHaveBeenNthCalledWith(
+    expect(updateVolunteerStatusMock).toHaveBeenNthCalledWith(
       1,
       volunteerMock,
       volunteerStatusHistoryMock.status

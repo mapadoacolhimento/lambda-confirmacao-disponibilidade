@@ -8,7 +8,7 @@ import {
   denyMatchConfirmation,
   fetchPreviousVolunteerStatus,
   updateTicketWithDenial,
-  updateVolunteerStatusToPreviousValue,
+  updateVolunteerStatus,
 } from "./matchDeniedLogic";
 
 export default async function denyMatch(
@@ -35,8 +35,5 @@ export default async function denyMatch(
     volunteer.id
   );
 
-  await updateVolunteerStatusToPreviousValue(
-    volunteer,
-    previousVolunteerStatus
-  );
+  await updateVolunteerStatus(volunteer, previousVolunteerStatus);
 }

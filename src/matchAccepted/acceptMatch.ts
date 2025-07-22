@@ -12,8 +12,9 @@ import {
 } from "./matchAcceptedLogic";
 import {
   fetchPreviousVolunteerStatus,
-  updateVolunteerStatusToPreviousValue,
+  updateVolunteerStatus,
 } from "../matchDenied/matchDeniedLogic";
+import { ZENDESK_USER_UNAVAILABLE_STATUS } from "../constants";
 
 export default async function acceptMatch(
   matchConfirmation: Pick<
@@ -34,27 +35,17 @@ export default async function acceptMatch(
 
   const authToken = await authenticateMatch();
 
+  const hasReachedMaxMatches = await checkMaxMatches(volunteer.id);
+
   const match = await createMatch(matchConfirmation, authToken);
 
-  const hasReachedMaxMatches = await checkMaxMatches(volunteer.id);
-  console.log(
-    `[handle-answer][acceptMatch] Volunteer ${volunteer.id} has reached max matches: ${hasReachedMaxMatches}`
-  );
+  let volunteerStatus: string = ZENDESK_USER_UNAVAILABLE_STATUS;
   if (!hasReachedMaxMatches) {
-    console.log(
-      `[handle-answer] Updating volunteer ${volunteer.id} after match`
-    );
-    const previousVolunteerStatus = await fetchPreviousVolunteerStatus(
-      volunteer.id
-    );
-    await updateVolunteerStatusToPreviousValue(
-      volunteer,
-      previousVolunteerStatus
-    );
+    volunteerStatus = await fetchPreviousVolunteerStatus(volunteer.id);
   }
-  console.log(
-    `[handle-answer] Confirming match confirmation for match ${matchConfirmation.matchConfirmationId}`
-  );
+
+  await updateVolunteerStatus(volunteer, volunteerStatus);
+
   await confirmMatchConfirmation(
     matchConfirmation.matchConfirmationId,
     match.matchId

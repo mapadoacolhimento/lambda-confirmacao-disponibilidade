@@ -18,6 +18,7 @@ export const ZENDESK_TICKET_WAITING_FOR_MATCH_STATUS =
 export const ZENDESK_USER_WAITING_FOR_CONFIRMATION_STATUS =
   "indisponivel_aguardando_confirmacao";
 export const ZENDESK_USER_AVAILABLE_STATUS = "disponivel";
+export const ZENDESK_USER_UNAVAILABLE_STATUS = "indisponivel_sem_vagas";
 
 // TWILIO
 export const TWILIO_ACCOUNT_SID = process.env["TWILIO_ACCOUNT_SID"];

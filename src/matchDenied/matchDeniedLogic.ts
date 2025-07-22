@@ -105,16 +105,16 @@ export async function fetchPreviousVolunteerStatus(volunteerId: number) {
   }
 }
 
-export async function updateVolunteerStatusToPreviousValue(
+export async function updateVolunteerStatus(
   volunteer: Pick<Volunteers, "id" | "zendeskUserId">,
-  previousStatus: string
+  volunteerStatus: string
 ) {
   console.log(
-    `Updating volunteer status to previous value: ${previousStatus} for volunteerId: ${volunteer.id}`
+    `Updating volunteer status : ${volunteerStatus} for volunteerId: ${volunteer.id}`
   );
   const volunteerZendeskUser: Pick<ZendeskUser, "id" | "user_fields"> = {
     id: volunteer.zendeskUserId as bigint,
-    user_fields: { condition: previousStatus },
+    user_fields: { condition: volunteerStatus },
   };
   const updatedZendeskUser = await updateUser(volunteerZendeskUser);
 
@@ -128,42 +128,34 @@ export async function updateVolunteerStatusToPreviousValue(
         id: volunteer.id,
       },
       data: {
-        condition: previousStatus,
+        condition: volunteerStatus,
         updated_at: new Date().toISOString(),
       },
     });
-    console.log(
-      `Volunteer status updated successfully: ${updatedVolunteer.id}`
-    );
+
     await client.volunteerStatusHistory.create({
       data: {
         volunteer_id: volunteer.id,
-        status: previousStatus,
+        status: volunteerStatus,
         created_at: new Date().toISOString(),
       },
     });
-    console.log(
-      `Volunteer status history created successfully for volunteerId: ${volunteer.id}`
-    );
+
     await client.volunteerAvailability.update({
       where: {
         volunteer_id: volunteer.id,
       },
       data: {
-        is_available: previousStatus == ZENDESK_USER_AVAILABLE_STATUS,
+        is_available: volunteerStatus == ZENDESK_USER_AVAILABLE_STATUS,
         updated_at: new Date().toISOString(),
       },
     });
-    console.log(
-      `Volunteer availability updated successfully for volunteerId: ${volunteer.id}`
-    );
     return updatedVolunteer;
   } catch (error) {
-    console.error(
+    throw new Error(
       `Error updating volunteer status: ${
         error instanceof Error ? error.message : String(error)
       }`
     );
-    return null;
   }
 }

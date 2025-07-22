@@ -30,9 +30,9 @@ const fetchPreviousVolunteerStatusMock = jest.spyOn(
   "fetchPreviousVolunteerStatus"
 );
 
-const updateVolunteerStatusToPreviousValueMock = jest.spyOn(
+const updateVolunteerStatusMock = jest.spyOn(
   matchDeniedLogic,
-  "updateVolunteerStatusToPreviousValue"
+  "updateVolunteerStatus"
 );
 
 describe("denyMatch", () => {
@@ -81,10 +81,10 @@ describe("denyMatch", () => {
     );
   });
 
-  it("should call updateVolunteerStatusToPreviousValue with correct params", async () => {
+  it("should call updateVolunteerStatus with correct params", async () => {
     await denyMatch(matchConfirmationMock, supportRequestMock, volunteerMock);
 
-    expect(updateVolunteerStatusToPreviousValueMock).toHaveBeenNthCalledWith(
+    expect(updateVolunteerStatusMock).toHaveBeenNthCalledWith(
       1,
       volunteerMock,
       volunteerStatusHistoryMock.status
