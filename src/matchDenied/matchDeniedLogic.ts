@@ -152,11 +152,10 @@ export async function updateVolunteerStatus(
     });
     return updatedVolunteer;
   } catch (error) {
-    console.error(
+    throw new Error(
       `Error updating volunteer status: ${
         error instanceof Error ? error.message : String(error)
       }`
     );
-    return null;
   }
 }
