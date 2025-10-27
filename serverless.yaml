@@ -73,7 +73,7 @@ functions:
 
   createConfirmation:
     handler: handler.createConfirmation
-    timeout: 30
+    timeout: 28
     events:
       - httpApi:
           path: /create-confirmation
@@ -84,7 +84,7 @@ functions:
 
   handleAnswer:
     handler: handler.handleAnswer
-    timeout: 30
+    timeout: 28
     events:
       - httpApi:
           path: /handle-answer
@@ -92,7 +92,7 @@ functions:
   
   expire:
     handler: handler.expire
-    timeout: 30
+    timeout: 28
     events:
       - httpApi:
           path: /expire
