@@ -26,6 +26,9 @@ custom:
     cloudWatchFilter: "*"
     nrRegion: 'eu'
     enableFunctionLogs: true
+  prune:
+    automatic: true
+    number: 10
 
 provider:
   name: aws
@@ -105,3 +108,4 @@ plugins:
   - serverless-webpack
   - serverless-offline
   - serverless-newrelic-lambda-layers
+  - serverless-prune-plugin
