@@ -19,7 +19,7 @@ function toErrorWithMessage(maybeError: unknown): ErrorWithMessage {
     return new Error(
       `Prisma returned an error code (${
         maybeError.code
-      }) on these fields, '${target.join(",")}', with this message: ${
+      }) on these fields, '${target?.join(",")}', with this message: ${
         maybeError.message
       }`
     );
